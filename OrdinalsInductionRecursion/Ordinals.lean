@@ -136,7 +136,24 @@ theorem mul_mono_left_subset {x₁ x₂ : PreOrd} (h : Subset x₁ x₂) (y : Pr
   | .succ y' => Subset_add (mul_mono_left_subset h y') h
   | .sup f => .sup_subset fun n => mul_mono_left_subset h (f n)
 
-theorem mul_respects {x₁ x₂ y₁ y₂ : PreOrd} (hx : x₁ ≈ x₂) (hy : y₁ ≈ y₂) : mul x₁ y₁ ≈ mul x₂ y₂ := by sorry
+mutual
+  theorem mul_mono_right_subset (x : PreOrd) {y₁ y₂ : PreOrd} (h : Subset y₁ y₂) : Subset (mul x y₁) (mul x y₂) :=
+    match y₁, y₂, h with
+    | _, _, .zero_subset _ => .zero_subset _
+    | _, _, .succ_subset hmem => mul_mono_right_mem x hmem
+    | _, _, .sup_subset hsub => .sup_subset fun n => mul_mono_right_subset x (hsub n)
+
+  theorem mul_mono_right_mem (x : PreOrd) {a b : PreOrd} (h : Mem a b) : Subset (add (mul x a) x) (mul x b) :=
+    match b, h with
+    | _, .mem_succ hsub => Subset_add (mul_mono_right_subset x hsub) (Subset_refl x)
+    | _, .mem_sup n hmem => Subset_sup (mul_mono_right_mem x hmem) n rfl
+end
+
+theorem Subset_mul {x₁ x₂ y₁ y₂ : PreOrd} (hx : Subset x₁ x₂) (hy : Subset y₁ y₂) : Subset (mul x₁ y₁) (mul x₂ y₂) :=
+  Subset_trans (mul_mono_left_subset hx y₁) (mul_mono_right_subset x₂ hy)
+
+theorem mul_respects {x₁ x₂ y₁ y₂ : PreOrd} (hx : x₁ ≈ x₂) (hy : y₁ ≈ y₂) : mul x₁ y₁ ≈ mul x₂ y₂ :=
+  ⟨Subset_mul hx.left hy.left, Subset_mul hx.right hy.right⟩
 
 def pow (x : PreOrd) : PreOrd → PreOrd
   | zero   => succ zero
