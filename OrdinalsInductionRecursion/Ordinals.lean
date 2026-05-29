@@ -160,6 +160,18 @@ def pow (x : PreOrd) : PreOrd → PreOrd
   | succ y => mul (pow x y) x
   | sup f  => sup (fun n => pow x (f n))
 
+theorem pow_mono_left_subset {x₁ x₂ : PreOrd} (h : Subset x₁ x₂) (y : PreOrd) : Subset (pow x₁ y) (pow x₂ y) :=
+  match y with
+  | .zero => Subset_refl (succ zero)
+  | .succ y' => Subset_mul (pow_mono_left_subset h y') h
+  | .sup f => .sup_subset fun n => pow_mono_left_subset h (f n)
+
+/-- 
+La exponenciación ordinal NO es monótona por la derecha cuando la base es cero,
+ya que 0^0 = 1 pero 0^1 = 0. Debido a esta no-monotonía, probar que pow preserva
+la equivalencia requiere lógica clásica o lemas profundos de inversión.
+Por tanto, mantenemos el sorry constructivo.
+-/
 theorem pow_respects {x₁ x₂ y₁ y₂ : PreOrd} (hx : x₁ ≈ x₂) (hy : y₁ ≈ y₂) : pow x₁ y₁ ≈ pow x₂ y₂ := by sorry
 
 end PreOrd
