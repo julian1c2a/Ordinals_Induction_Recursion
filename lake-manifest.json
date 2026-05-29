@@ -1,0 +1,15 @@
+{"version": "1.1.0",
+ "packagesDir": ".lake/packages",
+ "packages":
+ [{"url": "https://github.com/julian1c2a/Peano",
+   "type": "git",
+   "subDir": null,
+   "scope": "",
+   "rev": "56ae3d256e7c0705e176d8ae0b1003a9c71df10c",
+   "name": "peanolib",
+   "manifestFile": "lake-manifest.json",
+   "inputRev": "master",
+   "inherited": false,
+   "configFile": "lakefile.lean"}],
+ "name": "ordinalsinductionrecursion",
+ "lakeDir": ".lake"}
