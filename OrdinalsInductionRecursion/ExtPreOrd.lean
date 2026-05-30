@@ -274,4 +274,173 @@ def sInter : PreOrd → PreOrd
 theorem sInter_respects {x y : PreOrd} (_ : Equiv x y) : Equiv (sInter x) (sInter y) :=
   ⟨Subset_refl _, Subset_refl _⟩
 
+
+open Classical
+
+def TotalProp (x : PreOrd) : Prop :=
+  ∀ y, (Subset x y ∨ Subset y x) ∧ (Mem x y ∨ Subset y x) ∧ (Mem y x ∨ Subset x y)
+
+theorem total_prop (x : PreOrd) : TotalProp x :=
+  match x with
+  | .zero => fun y =>
+    let rec tz (y : PreOrd) : (Subset zero y ∨ Subset y zero) ∧ (Mem zero y ∨ Subset y zero) ∧ (Mem y zero ∨ Subset zero y) :=
+      match y with
+      | .zero => ⟨Or.inl (.zero_subset _), Or.inr (.zero_subset _), Or.inr (.zero_subset _)⟩
+      | .succ y' => ⟨Or.inl (.zero_subset _), Or.inl (.mem_succ (.zero_subset _)), Or.inr (.zero_subset _)⟩
+      | .sup g =>
+        ⟨Or.inl (.zero_subset _),
+         if h : ∃ n, Mem zero (g n) then
+           let ⟨n, hn⟩ := h
+           Or.inl (.mem_sup n hn)
+         else
+           Or.inr (.sup_subset fun n =>
+             match (tz (g n)).2.1 with
+             | Or.inl hn => False.elim (h ⟨n, hn⟩)
+             | Or.inr hs => hs
+           ),
+         Or.inr (.zero_subset _)⟩
+    tz y
+  | .succ x' => fun y =>
+    let ih_x := total_prop x'
+    let rec ts (y : PreOrd) : (Subset (succ x') y ∨ Subset y (succ x')) ∧ (Mem (succ x') y ∨ Subset y (succ x')) ∧ (Mem y (succ x') ∨ Subset (succ x') y) :=
+      match y with
+      | .zero => ⟨Or.inr (.zero_subset _), Or.inr (.zero_subset _), Or.inl (.mem_succ (.zero_subset _))⟩
+      | .succ y' =>
+        let p1 : Subset (succ x') (succ y') ∨ Subset (succ y') (succ x') :=
+          match (ih_x (succ y')).2.1 with
+          | Or.inl hm => Or.inl (.succ_subset hm)
+          | Or.inr hs => Or.inr (subset_succ_mono hs)
+        let p2 : Mem (succ x') (succ y') ∨ Subset (succ y') (succ x') :=
+          match (ih_x y').2.1 with
+          | Or.inl hm => Or.inl (.mem_succ (.succ_subset hm))
+          | Or.inr hs => Or.inr (.succ_subset (.mem_succ hs))
+        let p3 : Mem (succ y') (succ x') ∨ Subset (succ x') (succ y') :=
+          match (ih_x y').2.2 with
+          | Or.inl hm => Or.inl (.mem_succ (.succ_subset hm))
+          | Or.inr hs => Or.inr (.succ_subset (.mem_succ hs))
+        ⟨p1, p2, p3⟩
+      | .sup g =>
+        let ih_y_n := fun n => ts (g n)
+        let p1 : Subset (succ x') (sup g) ∨ Subset (sup g) (succ x') :=
+          if h : ∃ n, Mem x' (g n) then
+            let ⟨n, hn⟩ := h
+            Or.inl (.succ_subset (.mem_sup n hn))
+          else
+            Or.inr (.sup_subset fun n =>
+              match (ih_x (g n)).2.1 with
+              | Or.inl hm => False.elim (h ⟨n, hm⟩)
+              | Or.inr hs => subset_succ_mono hs
+            )
+        let p2 : Mem (succ x') (sup g) ∨ Subset (sup g) (succ x') :=
+          if h : ∃ n, Mem (succ x') (g n) then
+            let ⟨n, hn⟩ := h
+            Or.inl (.mem_sup n hn)
+          else
+            Or.inr (.sup_subset fun n =>
+              match (ih_y_n n).2.1 with
+              | Or.inl hm => False.elim (h ⟨n, hm⟩)
+              | Or.inr hs => hs
+            )
+        let p3 : Mem (sup g) (succ x') ∨ Subset (succ x') (sup g) :=
+          if h : ∃ n, ¬ Subset (g n) x' then
+            let ⟨n, hn⟩ := h
+            Or.inr (
+              match (ih_x (g n)).2.1 with
+              | Or.inl hm => .succ_subset (.mem_sup n hm)
+              | Or.inr hs => False.elim (hn hs)
+            )
+          else
+            Or.inl (.mem_succ (.sup_subset fun n => 
+              if hn : Subset (g n) x' then hn else False.elim (h ⟨n, hn⟩)
+            ))
+        ⟨p1, p2, p3⟩
+    ts y
+  | .sup f => fun y =>
+    let ih_f := fun n => total_prop (f n)
+    let rec total_sup (y : PreOrd) : (Subset (sup f) y ∨ Subset y (sup f)) ∧ (Mem (sup f) y ∨ Subset y (sup f)) ∧ (Mem y (sup f) ∨ Subset (sup f) y) :=
+      match y with
+      | .zero => 
+        let p1 : Subset (sup f) zero ∨ Subset zero (sup f) := Or.inr (.zero_subset _)
+        let p2 : Mem (sup f) zero ∨ Subset zero (sup f) := Or.inr (.zero_subset _)
+        let p3 : Mem zero (sup f) ∨ Subset (sup f) zero :=
+          if h : ∃ n, Mem zero (f n) then
+            let ⟨n, hn⟩ := h
+            Or.inl (.mem_sup n hn)
+          else
+            Or.inr (.sup_subset fun n =>
+              match (ih_f n zero).2.2 with
+              | Or.inl hm => False.elim (h ⟨n, hm⟩)
+              | Or.inr hs => hs
+            )
+        ⟨p1, p2, p3⟩
+      | .succ y' =>
+        let p1 : Subset (sup f) (succ y') ∨ Subset (succ y') (sup f) :=
+          if h : ∃ n, ¬ Subset (f n) (succ y') then
+            let ⟨n, hn⟩ := h
+            Or.inr (
+              match (ih_f n (succ y')).1 with
+              | Or.inl hs => False.elim (hn hs)
+              | Or.inr hs => Subset_trans hs (Subset_sup (Subset_refl _) n rfl)
+            )
+          else
+            Or.inl (.sup_subset fun n => if hn : Subset (f n) (succ y') then hn else False.elim (h ⟨n, hn⟩))
+        let p2 : Mem (sup f) (succ y') ∨ Subset (succ y') (sup f) :=
+          if h : ∃ n, ¬ Subset (f n) y' then
+            let ⟨n, hn⟩ := h
+            Or.inr (
+              match (ih_f n y').2.2 with
+              | Or.inl hm => .succ_subset (.mem_sup n hm)
+              | Or.inr hs => False.elim (hn hs)
+            )
+          else
+            Or.inl (.mem_succ (.sup_subset fun n => if hn : Subset (f n) y' then hn else False.elim (h ⟨n, hn⟩)))
+        let p3 : Mem (succ y') (sup f) ∨ Subset (sup f) (succ y') :=
+          if h : ∃ n, Mem (succ y') (f n) then
+            let ⟨n, hn⟩ := h
+            Or.inl (.mem_sup n hn)
+          else
+            Or.inr (.sup_subset fun n => 
+              match (ih_f n (succ y')).2.2 with
+              | Or.inl hm => False.elim (h ⟨n, hm⟩)
+              | Or.inr hs => hs
+            )
+        ⟨p1, p2, p3⟩
+      | .sup g =>
+        let ih_y_n := fun m => total_sup (g m)
+        let p1 : Subset (sup f) (sup g) ∨ Subset (sup g) (sup f) :=
+          if h : ∃ n, ¬ Subset (f n) (sup g) then
+            let ⟨n, hn⟩ := h
+            Or.inr (
+              match (ih_f n (sup g)).1 with
+              | Or.inl hs => False.elim (hn hs)
+              | Or.inr hs => Subset_trans hs (Subset_sup (Subset_refl _) n rfl)
+            )
+          else
+            Or.inl (.sup_subset fun n => if hn : Subset (f n) (sup g) then hn else False.elim (h ⟨n, hn⟩))
+        let p2 : Mem (sup f) (sup g) ∨ Subset (sup g) (sup f) :=
+          if h : ∃ m, Mem (sup f) (g m) then
+            let ⟨m, hm⟩ := h
+            Or.inl (.mem_sup m hm)
+          else
+            Or.inr (.sup_subset fun m =>
+              match (ih_y_n m).2.1 with
+              | Or.inl hm => False.elim (h ⟨m, hm⟩)
+              | Or.inr hs => hs
+            )
+        let p3 : Mem (sup g) (sup f) ∨ Subset (sup f) (sup g) :=
+          if h : ∃ n, Mem (sup g) (f n) then
+            let ⟨n, hn⟩ := h
+            Or.inl (.mem_sup n hn)
+          else
+            Or.inr (.sup_subset fun n =>
+              match (ih_f n (sup g)).2.2 with
+              | Or.inl hm => False.elim (h ⟨n, hm⟩)
+              | Or.inr hs => hs
+            )
+        ⟨p1, p2, p3⟩
+    total_sup y
+
+theorem le_total (x y : PreOrd) : Subset x y ∨ Subset y x :=
+  (total_prop x y).1
+
 end PreOrd
