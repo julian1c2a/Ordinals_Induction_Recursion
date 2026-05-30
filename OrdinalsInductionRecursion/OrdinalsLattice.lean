@@ -4,31 +4,31 @@ import OrdinalsInductionRecursion.ExtPreOrd
 namespace Ordinal
 
 theorem le_refl (x : Ordinal) : x ≤ x :=
-  Quotient.inductionOn x fun a => PreOrd.Subset_refl a
+  Quotient.inductionOn x fun _ => PreOrd.Subset_refl _
 
 theorem le_trans {x y z : Ordinal} : x ≤ y → y ≤ z → x ≤ z :=
-  Quotient.inductionOn₃ x y z fun a b c h1 h2 => PreOrd.Subset_trans h1 h2
+  Quotient.inductionOn₃ x y z fun _ _ _ h1 h2 => PreOrd.Subset_trans h1 h2
 
 theorem le_antisymm {x y : Ordinal} : x ≤ y → y ≤ x → x = y :=
-  Quotient.inductionOn₂ x y fun a b h1 h2 => Quotient.sound ⟨h1, h2⟩
+  Quotient.inductionOn₂ x y fun _ _ h1 h2 => Quotient.sound ⟨h1, h2⟩
 
 theorem subset_union_left (x y : Ordinal) : x ≤ union x y :=
-  Quotient.inductionOn₂ x y fun a b => PreOrd.subset_union_left a b
+  Quotient.inductionOn₂ x y fun _ _ => PreOrd.subset_union_left _ _
 
 theorem subset_union_right (x y : Ordinal) : y ≤ union x y :=
-  Quotient.inductionOn₂ x y fun a b => PreOrd.subset_union_right a b
+  Quotient.inductionOn₂ x y fun _ _ => PreOrd.subset_union_right _ _
 
 theorem union_subset {x y z : Ordinal} : x ≤ z → y ≤ z → union x y ≤ z :=
-  Quotient.inductionOn₃ x y z fun a b c h1 h2 => PreOrd.union_subset h1 h2
+  Quotient.inductionOn₃ x y z fun _ _ _ h1 h2 => PreOrd.union_subset h1 h2
 
 theorem inter_subset_left (x y : Ordinal) : inter x y ≤ x :=
-  Quotient.inductionOn₂ x y fun a b => PreOrd.inter_subset_left a b
+  Quotient.inductionOn₂ x y fun _ _ => PreOrd.inter_subset_left _ _
 
 theorem inter_subset_right (x y : Ordinal) : inter x y ≤ y :=
-  Quotient.inductionOn₂ x y fun a b => PreOrd.inter_subset_right a b
+  Quotient.inductionOn₂ x y fun _ _ => PreOrd.inter_subset_right _ _
 
 theorem subset_inter {x y z : Ordinal} : z ≤ x → z ≤ y → z ≤ inter x y :=
-  Quotient.inductionOn₃ x y z fun a b c h1 h2 => PreOrd.subset_inter h1 h2
+  Quotient.inductionOn₃ x y z fun _ _ _ h1 h2 => PreOrd.subset_inter h1 h2
 
 theorem union_comm (x y : Ordinal) : union x y = union y x :=
   le_antisymm (union_subset (subset_union_right y x) (subset_union_left y x))
@@ -39,7 +39,7 @@ theorem inter_comm (x y : Ordinal) : inter x y = inter y x :=
               (subset_inter (z := inter y x) (x := x) (y := y) (inter_subset_right y x) (inter_subset_left y x))
 
 theorem le_total (x y : Ordinal) : x ≤ y ∨ y ≤ x :=
-  Quotient.inductionOn₂ x y fun a b => PreOrd.le_total a b
+  Quotient.inductionOn₂ x y fun _ _ => PreOrd.le_total _ _
 
 theorem inter_union_distrib_left (x y z : Ordinal) : inter x (union y z) = union (inter x y) (inter x z) := by
   match le_total y z with
