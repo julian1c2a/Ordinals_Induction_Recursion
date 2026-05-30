@@ -103,6 +103,90 @@ theorem inter_respects {x₁ x₂ y₁ y₂ : PreOrd} (hx : Equiv x₁ x₂) (hy
    Subset_trans (inter_mono_left_subset hx.right y₂) (inter_mono_right_subset x₁ hy.right)⟩
 
 
+theorem inter_succ_y_subset {x' : PreOrd}
+  (ih : ∀ y, Subset (inter x' y) x') (y : PreOrd) : Subset (inter_succ_y (inter x') y) (succ x') :=
+  match y with
+  | .zero => .zero_subset _
+  | .succ y' => .succ_subset (.mem_succ (ih y'))
+  | .sup g => .sup_subset fun n => inter_succ_y_subset ih (g n)
+
+theorem inter_subset_left (x y : PreOrd) : Subset (inter x y) x :=
+  match x with
+  | .zero => .zero_subset _
+  | .succ x' => inter_succ_y_subset (fun y => inter_subset_left x' y) y
+  | .sup f => .sup_subset fun n => Subset_sup (inter_subset_left (f n) y) n rfl
+
+theorem inter_succ_y_subset_right {x' y : PreOrd}
+  (ih : ∀ y, Subset (inter x' y) y) : Subset (inter_succ_y (inter x') y) y :=
+  match y with
+  | .zero => .zero_subset _
+  | .succ y' => .succ_subset (.mem_succ (ih y'))
+  | .sup g => .sup_subset fun n => Subset_sup (inter_succ_y_subset_right ih) n rfl
+
+theorem inter_subset_right (x y : PreOrd) : Subset (inter x y) y :=
+  match x with
+  | .zero => .zero_subset _
+  | .succ x' => inter_succ_y_subset_right (fun y => inter_subset_right x' y)
+  | .sup f => .sup_subset fun n => inter_subset_right (f n) y
+
+
+
+theorem subset_inter_fixed {x y : PreOrd} (H_mem : ∀ z, Mem z x → Mem z y → Mem z (inter x y))
+  {z : PreOrd} (hx : Subset z x) (hy : Subset z y) : Subset z (inter x y) :=
+  match z, hx, hy with
+  | .zero, _, _ => .zero_subset _
+  | .succ z', .succ_subset hx_mem, .succ_subset hy_mem => .succ_subset (H_mem z' hx_mem hy_mem)
+  | .sup f, .sup_subset hx_sub, .sup_subset hy_sub => .sup_subset fun n => subset_inter_fixed H_mem (hx_sub n) (hy_sub n)
+
+theorem mem_inter_succ_y_fixed {x' y : PreOrd} (H_sub : ∀ z y', Subset z x' → Subset z y' → Subset z (inter x' y'))
+  {z : PreOrd} (hx : Subset z x') (hy : Mem z y) : Mem z (inter_succ_y (inter x') y) :=
+  match y, hy with
+  | .succ y', .mem_succ hy_sub => .mem_succ (H_sub z y' hx hy_sub)
+  | .sup g, .mem_sup n hmem => .mem_sup n (mem_inter_succ_y_fixed H_sub hx hmem)
+
+def mem_succ_cases {x' z : PreOrd} (hx : Mem z (succ x')) {motive : Mem z (succ x') → Prop}
+  (f : ∀ hx_sub, motive (.mem_succ hx_sub)) : motive hx :=
+  match hx with
+  | .mem_succ hx_sub => f hx_sub
+
+def mem_sup_cases {F : ℕ₀ → PreOrd} {z : PreOrd} (hx : Mem z (sup F)) {motive : Mem z (sup F) → Prop}
+  (g : ∀ n hx_mem, motive (.mem_sup n hx_mem)) : motive hx :=
+  match hx with
+  | .mem_sup n hx_mem => g n hx_mem
+
+def mem_zero_cases {z : PreOrd} (hx : Mem z zero) {motive : Mem z zero → Prop} : motive hx :=
+  nomatch hx
+
+def InterProp (x : PreOrd) : Prop :=
+  ∀ y, (∀ z, Subset z x → Subset z y → Subset z (inter x y)) ∧
+       (∀ z, Mem z x → Mem z y → Mem z (inter x y))
+
+theorem inter_prop (x : PreOrd) : InterProp x :=
+  match x with
+  | .zero => fun y =>
+    ⟨fun z hx hy => subset_inter_fixed (fun z hx hy => mem_zero_cases (motive := fun _ => Mem z (inter zero y)) hx) hx hy,
+     fun z hx hy => mem_zero_cases (motive := fun _ => Mem z (inter zero y)) hx⟩
+  | .succ x' => fun y =>
+    let ih_x' := inter_prop x'
+    let mem_prop : ∀ z, Mem z (succ x') → Mem z y → Mem z (inter (succ x') y) :=
+      fun z hx hy => mem_succ_cases (motive := fun _ => Mem z (inter (succ x') y)) hx
+        (fun hx_sub => mem_inter_succ_y_fixed (fun z y' => (ih_x' y').1 z) hx_sub hy)
+    ⟨fun z hx hy => subset_inter_fixed mem_prop hx hy, mem_prop⟩
+  | .sup f => fun y =>
+    let ih_f := fun n => inter_prop (f n)
+    let mem_prop : ∀ z, Mem z (sup f) → Mem z y → Mem z (inter (sup f) y) :=
+      fun z hx hy => mem_sup_cases (motive := fun _ => Mem z (inter (sup f) y)) hx
+        (fun n hx_mem => Mem.mem_sup n ((ih_f n y).2 z hx_mem hy))
+    ⟨fun z hx hy => subset_inter_fixed mem_prop hx hy, mem_prop⟩
+
+theorem subset_inter {x y z : PreOrd} (hx : Subset z x) (hy : Subset z y) : Subset z (inter x y) :=
+  (inter_prop x y).1 z hx hy
+
+theorem mem_inter {x y z : PreOrd} (hx : Mem z x) (hy : Mem z y) : Mem z (inter x y) :=
+  (inter_prop x y).2 z hx hy
+
+
+
 -- ==========================================
 -- Unión Binaria
 -- ==========================================
@@ -125,6 +209,18 @@ theorem union_mono_right (x : PreOrd) {y₁ y₂ : PreOrd} (h : Subset y₁ y₂
 theorem union_respects {x₁ x₂ y₁ y₂ : PreOrd} (hx : Equiv x₁ x₂) (hy : Equiv y₁ y₂) : Equiv (union x₁ y₁) (union x₂ y₂) :=
   ⟨Subset_trans (union_mono_left hx.left y₁) (union_mono_right x₂ hy.left),
    Subset_trans (union_mono_left hx.right y₂) (union_mono_right x₁ hy.right)⟩
+
+
+theorem subset_union_left (x y : PreOrd) : Subset x (union x y) :=
+  Subset_sup (Subset_refl _) .zero rfl
+
+theorem subset_union_right (x y : PreOrd) : Subset y (union x y) :=
+  Subset_sup (Subset_refl _) (.succ .zero) rfl
+
+theorem union_subset {x y z : PreOrd} (hx : Subset x z) (hy : Subset y z) : Subset (union x y) z :=
+  .sup_subset fun n => match n with
+    | .zero => hx
+    | .succ _ => hy
 
 
 -- ==========================================
