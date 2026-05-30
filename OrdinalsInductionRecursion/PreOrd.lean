@@ -35,8 +35,6 @@ instance : HasSubset PreOrd := ⟨Subset⟩
 /-- Igualdad extensional (equivalencia) de pre-ordinales -/
 def Equiv (x y : PreOrd) : Prop := Subset x y ∧ Subset y x
 
-notation:50 x " ≈ " y => Equiv x y
-
 -- ==========================================
 -- Lemas de Equivalencia (Setoid)
 -- ==========================================
@@ -47,47 +45,62 @@ theorem Subset_sup {y z : PreOrd} (h : Subset y z) {f : ℕ₀ → PreOrd} (n : 
   | _, _, .succ_subset hmem => .succ_subset (Mem.mem_sup n (hz ▸ hmem))
   | _, _, .sup_subset hsub => .sup_subset fun k => Subset_sup (hsub k) n hz
 
-mutual
-  theorem Subset_refl (x : PreOrd) : Subset x x :=
+theorem Subset_refl (x : PreOrd) : Subset x x :=
+  match x with
+  | .zero => .zero_subset _
+  | .succ x' => .succ_subset (.mem_succ (Subset_refl x'))
+  | .sup f => .sup_subset fun n => Subset_sup (Subset_refl (f n)) n rfl
+
+theorem Mem_self_succ (x : PreOrd) : Mem x (succ x) :=
+  .mem_succ (Subset_refl x)
+
+def trans_all (x : PreOrd) :
+  (∀ {y z}, Subset x y → Subset y z → Subset x z) ∧
+  (∀ {y z}, Mem x y → Subset y z → Mem x z) ∧
+  (∀ {y z}, Subset x y → Mem y z → Mem x z) :=
+  let sub_sub : ∀ {y z}, Subset x y → Subset y z → Subset x z :=
     match x with
-    | .zero => .zero_subset _
-    | .succ x' => .succ_subset (Mem_self_succ x')
-    | .sup f => .sup_subset fun n => Subset_sup (Subset_refl (f n)) n rfl
+    | .zero => fun _ _ => .zero_subset _
+    | .succ x' => fun h1 h2 =>
+      match h1 with
+      | @Subset.succ_subset _ _ hmem1 => .succ_subset ((trans_all x').2.1 hmem1 h2)
+    | .sup f => fun h1 h2 =>
+      match h1 with
+      | @Subset.sup_subset _ _ hsub1 => .sup_subset fun n => (trans_all (f n)).1 (hsub1 n) h2
 
-  theorem Mem_self_succ (x : PreOrd) : Mem x (succ x) :=
-    .mem_succ (Subset_refl x)
-end
+  let rec sub_mem {y z} (h1 : Subset x y) (h2 : Mem y z) : Mem x z :=
+    match y, z, h2 with
+    | _, _, .mem_succ hsub2 => .mem_succ (sub_sub h1 hsub2)
+    | _, _, .mem_sup n hmem2 => .mem_sup n (sub_mem h1 hmem2)
 
-mutual
-  theorem Subset_trans {x y z : PreOrd} (h1 : Subset x y) (h2 : Subset y z) : Subset x z :=
-    match x, y, h1 with
-    | _, _, .zero_subset _ => .zero_subset _
-    | _, _, .succ_subset hmem1 => .succ_subset (Mem_Subset_trans hmem1 h2)
-    | _, _, .sup_subset hsub1 => .sup_subset fun n => Subset_trans (hsub1 n) h2
-
-  theorem Mem_Subset_trans {x y z : PreOrd} (h1 : Mem x y) (h2 : Subset y z) : Mem x z :=
+  let rec mem_sub {y z} (h1 : Mem x y) (h2 : Subset y z) : Mem x z :=
     match y, z, h2 with
     | _, _, .zero_subset _ => nomatch h1
-    | _, _, .succ_subset hmem2 =>
-      match x, y, h1 with
-      | _, _, .mem_succ hsub1 => Subset_Mem_trans hsub1 hmem2
-    | _, _, .sup_subset hsub2 =>
-      match x, y, h1 with
-      | _, _, .mem_sup n hmem1 => Mem_Subset_trans hmem1 (hsub2 n)
+    | _, _, @Subset.succ_subset y' _ hmem2 =>
+      match h1 with
+      | @Mem.mem_succ _ _ hsub1 => sub_mem hsub1 hmem2
+    | _, _, @Subset.sup_subset g _ hsub2 =>
+      match h1 with
+      | @Mem.mem_sup _ _ n hmem1 => mem_sub hmem1 (hsub2 n)
 
-  theorem Subset_Mem_trans {x y z : PreOrd} (h1 : Subset x y) (h2 : Mem y z) : Mem x z :=
-    match y, z, h2 with
-    | _, _, .mem_succ hsub2 => .mem_succ (Subset_trans h1 hsub2)
-    | _, _, .mem_sup n hmem2 => .mem_sup n (Subset_Mem_trans h1 hmem2)
-end
+  ⟨sub_sub, mem_sub, sub_mem⟩
 
-theorem Equiv_refl (x : PreOrd) : x ≈ x :=
+theorem Subset_trans {x y z : PreOrd} (h1 : Subset x y) (h2 : Subset y z) : Subset x z :=
+  (trans_all x).1 h1 h2
+
+theorem Mem_Subset_trans {x y z : PreOrd} (h1 : Mem x y) (h2 : Subset y z) : Mem x z :=
+  (trans_all x).2.1 h1 h2
+
+theorem Subset_Mem_trans {x y z : PreOrd} (h1 : Subset x y) (h2 : Mem y z) : Mem x z :=
+  (trans_all x).2.2 h1 h2
+
+theorem Equiv_refl (x : PreOrd) : Equiv x x :=
   ⟨Subset_refl x, Subset_refl x⟩
 
-theorem Equiv_symm {x y : PreOrd} (h : x ≈ y) : y ≈ x :=
+theorem Equiv_symm {x y : PreOrd} (h : Equiv x y) : Equiv y x :=
   ⟨h.right, h.left⟩
 
-theorem Equiv_trans {x y z : PreOrd} (h1 : x ≈ y) (h2 : y ≈ z) : x ≈ z :=
+theorem Equiv_trans {x y z : PreOrd} (h1 : Equiv x y) (h2 : Equiv y z) : Equiv x z :=
   ⟨Subset_trans h1.left h2.left, Subset_trans h2.right h1.right⟩
 
 instance Setoid : Setoid PreOrd where
@@ -98,11 +111,10 @@ instance Setoid : Setoid PreOrd where
     trans := Equiv_trans
   }
 
-def fromNat : ℕ₀ → PreOrd
+def preFromNat : ℕ₀ → PreOrd
   | .zero   => zero
-  | .succ n => succ (fromNat n)
+  | .succ n => succ (preFromNat n)
 
-def omega : PreOrd := sup fromNat
-notation "ω" => omega
+def preomega : PreOrd := sup preFromNat
 
 end PreOrd
