@@ -128,6 +128,8 @@ def preFromNat : ℕ₀ → PreOrd.{u}
   | .zero   => zero
   | .succ n => succ (preFromNat n)
 
+instance : Coe ℕ₀ PreOrd.{u} := ⟨preFromNat⟩
+
 def preomega : PreOrd.{u} := sup (α := ULift.{u, 0} ℕ₀) (fun n => preFromNat n.down)
 
 end PreOrd

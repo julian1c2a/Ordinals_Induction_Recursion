@@ -115,6 +115,8 @@ def preFromNat : ℕ₀ → PreOrd
   | .zero   => zero
   | .succ n => succ (preFromNat n)
 
+instance : Coe ℕ₀ PreOrd := ⟨preFromNat⟩
+
 def preomega : PreOrd := sup preFromNat
 
 end PreOrd
