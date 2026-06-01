@@ -1,1 +1,5 @@
-import OrdinalsInductionRecursion.OrdinalsLattice
+import OrdinalsInductionRecursion.UnivOrd.Ordinals
+import OrdinalsInductionRecursion.UnivOrd.OrdinalsLattice
+import OrdinalsInductionRecursion.UnivOrd.WellOrder
+import OrdinalsInductionRecursion.UnivOrd.Arith
+import OrdinalsInductionRecursion.CountableSets.HCSet
