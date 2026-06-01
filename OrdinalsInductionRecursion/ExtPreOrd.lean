@@ -121,7 +121,7 @@ theorem inter_succ_y_subset_right {x' y : PreOrd}
   match y with
   | .zero => .zero_subset _
   | .succ y' => .succ_subset (.mem_succ (ih y'))
-  | .sup g => .sup_subset fun n => Subset_sup (inter_succ_y_subset_right ih) n rfl
+  | .sup _ => .sup_subset fun n => Subset_sup (inter_succ_y_subset_right ih) n rfl
 
 theorem inter_subset_right (x y : PreOrd) : Subset (inter x y) y :=
   match x with
@@ -136,13 +136,13 @@ theorem subset_inter_fixed {x y : PreOrd} (H_mem : ∀ z, Mem z x → Mem z y �
   match z, hx, hy with
   | .zero, _, _ => .zero_subset _
   | .succ z', .succ_subset hx_mem, .succ_subset hy_mem => .succ_subset (H_mem z' hx_mem hy_mem)
-  | .sup f, .sup_subset hx_sub, .sup_subset hy_sub => .sup_subset fun n => subset_inter_fixed H_mem (hx_sub n) (hy_sub n)
+  | .sup _, .sup_subset hx_sub, .sup_subset hy_sub => .sup_subset fun n => subset_inter_fixed H_mem (hx_sub n) (hy_sub n)
 
 theorem mem_inter_succ_y_fixed {x' y : PreOrd} (H_sub : ∀ z y', Subset z x' → Subset z y' → Subset z (inter x' y'))
   {z : PreOrd} (hx : Subset z x') (hy : Mem z y) : Mem z (inter_succ_y (inter x') y) :=
   match y, hy with
   | .succ y', .mem_succ hy_sub => .mem_succ (H_sub z y' hx hy_sub)
-  | .sup g, .mem_sup n hmem => .mem_sup n (mem_inter_succ_y_fixed H_sub hx hmem)
+  | .sup _, .mem_sup n hmem => .mem_sup n (mem_inter_succ_y_fixed H_sub hx hmem)
 
 def mem_succ_cases {x' z : PreOrd} (hx : Mem z (succ x')) {motive : Mem z (succ x') → Prop}
   (f : ∀ hx_sub, motive (.mem_succ hx_sub)) : motive hx :=
@@ -164,20 +164,20 @@ def InterProp (x : PreOrd) : Prop :=
 theorem inter_prop (x : PreOrd) : InterProp x :=
   match x with
   | .zero => fun y =>
-    ⟨fun z hx hy => subset_inter_fixed (fun z hx hy => mem_zero_cases (motive := fun _ => Mem z (inter zero y)) hx) hx hy,
-     fun z hx hy => mem_zero_cases (motive := fun _ => Mem z (inter zero y)) hx⟩
+    ⟨fun _ hx hy => subset_inter_fixed (fun z hx _ => mem_zero_cases (motive := fun _ => Mem z (inter zero y)) hx) hx hy,
+     fun z hx _ => mem_zero_cases (motive := fun _ => Mem z (inter zero y)) hx⟩
   | .succ x' => fun y =>
     let ih_x' := inter_prop x'
     let mem_prop : ∀ z, Mem z (succ x') → Mem z y → Mem z (inter (succ x') y) :=
       fun z hx hy => mem_succ_cases (motive := fun _ => Mem z (inter (succ x') y)) hx
         (fun hx_sub => mem_inter_succ_y_fixed (fun z y' => (ih_x' y').1 z) hx_sub hy)
-    ⟨fun z hx hy => subset_inter_fixed mem_prop hx hy, mem_prop⟩
+    ⟨fun _ hx hy => subset_inter_fixed mem_prop hx hy, mem_prop⟩
   | .sup f => fun y =>
     let ih_f := fun n => inter_prop (f n)
     let mem_prop : ∀ z, Mem z (sup f) → Mem z y → Mem z (inter (sup f) y) :=
       fun z hx hy => mem_sup_cases (motive := fun _ => Mem z (inter (sup f) y)) hx
         (fun n hx_mem => Mem.mem_sup n ((ih_f n y).2 z hx_mem hy))
-    ⟨fun z hx hy => subset_inter_fixed mem_prop hx hy, mem_prop⟩
+    ⟨fun _ hx hy => subset_inter_fixed mem_prop hx hy, mem_prop⟩
 
 theorem subset_inter {x y z : PreOrd} (hx : Subset z x) (hy : Subset z y) : Subset z (inter x y) :=
   (inter_prop x y).1 z hx hy
@@ -286,7 +286,7 @@ theorem total_prop (x : PreOrd) : TotalProp x :=
     let rec tz (y : PreOrd) : (Subset zero y ∨ Subset y zero) ∧ (Mem zero y ∨ Subset y zero) ∧ (Mem y zero ∨ Subset zero y) :=
       match y with
       | .zero => ⟨Or.inl (.zero_subset _), Or.inr (.zero_subset _), Or.inr (.zero_subset _)⟩
-      | .succ y' => ⟨Or.inl (.zero_subset _), Or.inl (.mem_succ (.zero_subset _)), Or.inr (.zero_subset _)⟩
+      | .succ _ => ⟨Or.inl (.zero_subset _), Or.inl (.mem_succ (.zero_subset _)), Or.inr (.zero_subset _)⟩
       | .sup g =>
         ⟨Or.inl (.zero_subset _),
          if h : ∃ n, Mem zero (g n) then
