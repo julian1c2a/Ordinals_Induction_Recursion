@@ -9,6 +9,7 @@ import OrdinalsInductionRecursion.UnivOrd.OrdinalsLattice
 
 universe u
 
+namespace UnivOrd
 namespace PreOrd
 
 theorem acc_mem (x : PreOrd.{u}) : Acc Mem x := by
@@ -66,3 +67,4 @@ theorem lt_trichotomy (x y : Ordinal.{u}) : x < y ∨ x = y ∨ y < x :=
       | Or.inr h_a_le_b => Or.inr (Or.inl (Quotient.sound ⟨h_a_le_b, h_b_le_a⟩))
 
 end Ordinal
+end UnivOrd

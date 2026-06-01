@@ -8,6 +8,8 @@ import Peano
 
 open Peano
 
+namespace CountableOrd
+
 /-- El tipo de Pre-Ordinales de Von Neumann (árboles de Brouwer). -/
 inductive PreOrd : Type where
   | zero : PreOrd
@@ -120,3 +122,5 @@ instance : Coe ℕ₀ PreOrd := ⟨preFromNat⟩
 def preomega : PreOrd := sup preFromNat
 
 end PreOrd
+
+end CountableOrd

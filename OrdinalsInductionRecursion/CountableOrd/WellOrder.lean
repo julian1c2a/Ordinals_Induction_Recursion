@@ -7,6 +7,7 @@ License: MIT
 import OrdinalsInductionRecursion.CountableOrd.Ordinals
 import OrdinalsInductionRecursion.CountableOrd.OrdinalsLattice
 
+namespace CountableOrd
 namespace PreOrd
 
 theorem acc_mem (x : PreOrd) : Acc Mem x := by
@@ -64,3 +65,4 @@ theorem lt_trichotomy (x y : Ordinal) : x < y ∨ x = y ∨ y < x :=
       | Or.inr h_a_le_b => Or.inr (Or.inl (Quotient.sound ⟨h_a_le_b, h_b_le_a⟩))
 
 end Ordinal
+end CountableOrd

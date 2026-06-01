@@ -10,6 +10,8 @@ open Peano
 
 universe u
 
+namespace UnivOrd
+
 /-- El tipo de Pre-Ordinales de Von Neumann (árboles de Brouwer) universales. -/
 inductive PreOrd : Type (u + 1) where
   | zero : PreOrd
@@ -107,6 +109,44 @@ theorem Mem_Subset_trans {x y z : PreOrd} (h1 : Mem x y) (h2 : Subset y z) : Mem
 theorem Subset_Mem_trans {x y z : PreOrd} (h1 : Subset x y) (h2 : Mem y z) : Mem x z :=
   (trans_all x).2.2 h1 h2
 
+def trans_y (y : PreOrd.{u}) :
+  (Subset y (succ y)) ∧
+  (∀ {x}, Mem x y → Subset x y) :=
+  match y with
+  | .zero =>
+    ⟨Subset.zero_subset _, fun h => nomatch h⟩
+  | .succ a =>
+    let ih := trans_y a
+    let self_succ := Subset.succ_subset (Mem.mem_succ ih.1)
+    let rec sub_succ_a {x} (h : Subset x a) : Subset x (succ a) :=
+      match x, h with
+      | _, Subset.zero_subset _ => Subset.zero_subset _
+      | _, @Subset.succ_subset z _ hmem =>
+        Subset.succ_subset (Mem.mem_succ (ih.2 hmem))
+      | _, @Subset.sup_subset _ g _ hsub =>
+        Subset.sup_subset fun j => sub_succ_a (hsub j)
+    let mem_sub := fun {x} (h : Mem x (succ a)) =>
+      match x, h with
+      | _, Mem.mem_succ hsub => sub_succ_a hsub
+    ⟨self_succ, mem_sub⟩
+  | .sup f =>
+    let ih := fun i => trans_y (f i)
+    let mem_sub := fun {x} (h : Mem x (sup f)) =>
+      match x, h with
+      | _, Mem.mem_sup i hmem => Subset_sup ((ih i).2 hmem) i rfl
+    let rec sub_succ_sup {x} (h : Subset x (sup f)) : Subset x (succ (sup f)) :=
+      match x, h with
+      | _, Subset.zero_subset _ => Subset.zero_subset _
+      | _, @Subset.succ_subset z _ hmem =>
+        Subset.succ_subset (Mem.mem_succ (mem_sub hmem))
+      | _, @Subset.sup_subset _ g _ hsub =>
+        Subset.sup_subset fun j => sub_succ_sup (hsub j)
+    let self_succ := Subset.sup_subset fun i => sub_succ_sup (Subset_sup (Subset_refl _) i rfl)
+    ⟨self_succ, mem_sub⟩
+
+theorem mem_implies_subset {x y : PreOrd.{u}} (h : Mem x y) : Subset x y :=
+  (trans_y y).2 h
+
 theorem Equiv_refl (x : PreOrd) : Equiv x x :=
   ⟨Subset_refl x, Subset_refl x⟩
 
@@ -133,3 +173,4 @@ instance : Coe ℕ₀ PreOrd.{u} := ⟨preFromNat⟩
 def preomega : PreOrd.{u} := sup (α := ULift.{u, 0} ℕ₀) (fun n => preFromNat n.down)
 
 end PreOrd
+end UnivOrd

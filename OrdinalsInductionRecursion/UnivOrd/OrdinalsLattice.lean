@@ -3,6 +3,7 @@ import OrdinalsInductionRecursion.UnivOrd.ExtPreOrd
 
 universe u
 
+namespace UnivOrd
 namespace Ordinal
 
 theorem le_refl (x : Ordinal.{u}) : x ≤ x :=
@@ -59,3 +60,4 @@ theorem inter_union_distrib_left (x y z : Ordinal.{u}) : inter x (union y z) = u
     rw [H3]
 
 end Ordinal
+end UnivOrd

@@ -10,6 +10,7 @@ import OrdinalsInductionRecursion.UnivOrd.WellOrder
 
 universe u
 
+namespace UnivOrd
 namespace PreOrd
 
 /-- Suma de pre-ordinales -/
@@ -189,3 +190,4 @@ noncomputable instance : Pow Ordinal.{u} Ordinal.{u} where
   pow := pow
 
 end Ordinal
+end UnivOrd

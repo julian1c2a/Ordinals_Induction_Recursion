@@ -12,6 +12,8 @@ import OrdinalsInductionRecursion.UnivOrd.ExtPreOrd
 
 universe u
 
+namespace UnivOrd
+
 /-- El tipo de Ordinales de Von Neumann, definido como el cociente
     de los Pre-Ordinales respecto a la igualdad extensional -/
 def Ordinal.{u_} := Quotient PreOrd.Setoid.{u_}
@@ -54,3 +56,4 @@ def omega : Ordinal.{u} := Quotient.mk PreOrd.Setoid PreOrd.preomega
 notation "ω" => omega
 
 end Ordinal
+end UnivOrd

@@ -6,6 +6,8 @@ License: MIT
 
 import OrdinalsInductionRecursion.CountableOrd.ExtPreOrd
 
+namespace CountableOrd
+
 -- ==========================================
 -- Tipo Cociente: Ordinal
 -- ==========================================
@@ -52,3 +54,5 @@ def omega : Ordinal := Quotient.mk PreOrd.Setoid PreOrd.preomega
 notation "ω" => omega
 
 end Ordinal
+
+end CountableOrd

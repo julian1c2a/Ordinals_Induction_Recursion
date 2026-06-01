@@ -6,6 +6,7 @@ License: MIT
 
 import OrdinalsInductionRecursion.UnivOrd.PreOrd
 
+namespace UnivOrd
 namespace PreOrd
 
 -- ==========================================
@@ -444,3 +445,4 @@ theorem le_total (x y : PreOrd) : Subset x y ∨ Subset y x :=
   (total_prop x y).1
 
 end PreOrd
+end UnivOrd

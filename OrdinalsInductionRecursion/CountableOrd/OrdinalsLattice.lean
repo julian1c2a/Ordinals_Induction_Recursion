@@ -1,6 +1,7 @@
 import OrdinalsInductionRecursion.CountableOrd.Ordinals
 import OrdinalsInductionRecursion.CountableOrd.ExtPreOrd
 
+namespace CountableOrd
 namespace Ordinal
 
 theorem le_refl (x : Ordinal) : x ≤ x :=
@@ -57,3 +58,4 @@ theorem inter_union_distrib_left (x y z : Ordinal) : inter x (union y z) = union
     rw [H3]
 
 end Ordinal
+end CountableOrd

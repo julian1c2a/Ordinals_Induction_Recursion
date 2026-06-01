@@ -1,80 +1,59 @@
-universe u
+import Peano
 
-inductive PreOrd : Type (u+1) where
-  | zero : PreOrd
-  | succ : PreOrd → PreOrd
-  | sup  : {α : Type u} → (α → PreOrd) → PreOrd
+open Peano
 
-namespace PreOrd
-
-mutual
-  inductive Subset : PreOrd.{u} → PreOrd.{u} → Prop where
-    | zero_subset (y : PreOrd) : Subset .zero y
-    | succ_subset {x y : PreOrd} : Mem x y → Subset (.succ x) y
-    | sup_subset {α : Type u} {f : α → PreOrd} {y : PreOrd} : (∀ a, Subset (f a) y) → Subset (.sup f) y
-
-  inductive Mem : PreOrd.{u} → PreOrd.{u} → Prop where
-    | mem_succ {x y : PreOrd} : Subset x y → Mem x (.succ y)
-    | mem_sup {α : Type u} {f : α → PreOrd} {x : PreOrd} (a : α) : Mem x (f a) → Mem x (.sup f)
-end
-
-def union (a b : PreOrd.{u}) : PreOrd.{u} :=
-  .sup (α := ULift.{u, 0} Bool) (fun x => match x.down with
-    | true => a
-    | false => b)
-
-def add (a b : PreOrd.{u}) : PreOrd.{u} :=
-  match b with
-  | .zero => a
-  | .succ b' => .succ (add a b')
-def union (a b : PreOrd.{u}) : PreOrd.{u} :=
-  .sup (α := ULift.{u, 0} Bool) (fun x => match x.down with
-    | true => a
-    | false => b)
-
-theorem subset_union_left (x y : PreOrd.{u}) : Subset x (union x y) :=
-  Subset_sup (Subset_refl x) ⟨true⟩ rfl
-
-theorem subset_union_right (x y : PreOrd.{u}) : Subset y (union x y) :=
-  Subset_sup (Subset_refl y) ⟨false⟩ rfl
-
-theorem union_subset {x y z : PreOrd.{u}} (hx : Subset x z) (hy : Subset y z) : Subset (union x y) z :=
-  Subset.sup_subset fun a => match a.down with
-    | true => hx
-    | false => hy
-
-def add (a b : PreOrd.{u}) : PreOrd.{u} :=
-  match b with
-  | .zero => a
-  | .succ b' => .succ (add a b')
-  | .sup f => union a (.sup (fun k => add a (f k)))
-
-theorem add_mono_left {a1 a2 : PreOrd.{u}} (h : Subset a1 a2) (b : PreOrd.{u}) : Subset (add a1 b) (add a2 b) := by
-  induction b with
-  | zero => exact h
-  | succ b' ih => exact Subset.succ_subset (Mem.mem_succ ih)
-  | sup f ih =>
-    exact union_subset
-      (Subset_trans h (subset_union_left _ _))
-      (Subset_trans (Subset.sup_subset fun n => Subset_sup (ih n) n rfl) (subset_union_right _ _))
-
-theorem le_add_right (a b : PreOrd.{u}) : Subset a (add a b) := by
-  induction b with
-  | zero => exact Subset_refl a
-  | succ b' ih => exact mem_subset (Subset_Mem_trans ih (Mem_self_succ _))
-  | sup f ih => exact subset_union_left _ _
+inductive Tree : Type where
+  | zero : Tree
+  | succ : Tree → Tree
+  | sup  : (ℕ₀ → Tree) → Tree
 
 mutual
-  def add_mono_right_sub (a : PreOrd.{u}) {b1 b2 : PreOrd.{u}} (h : Subset b1 b2) : Subset (add a b1) (add a b2) :=
-    match b1, b2, h with
-    | _, b, .zero_subset _ => le_add_right a b
-    | _, _, .succ_subset hmem => .succ_subset (add_mono_right_mem a hmem)
-    | _, b, .sup_subset hsub => union_subset (le_add_right a b) (Subset.sup_subset fun n => add_mono_right_sub a (hsub n))
+  inductive Subset : Tree → Tree → Prop where
+    | zero_subset (y : Tree) : Subset .zero y
+    | succ_subset {x y : Tree} : Mem x y → Subset (.succ x) y
+    | sup_subset {f : ℕ₀ → Tree} {y : Tree} : (∀ n, Mem (f n) y) → Subset (.sup f) y
 
-  def add_mono_right_mem (a : PreOrd.{u}) {b1 b2 : PreOrd.{u}} (h : Mem b1 b2) : Mem (add a b1) (add a b2) :=
-    match b1, b2, h with
-    | _, _, .mem_succ hsub => .mem_succ (add_mono_right_sub a hsub)
-    | _, _, .mem_sup n hmem => .mem_sup ⟨false⟩ (.mem_sup n (add_mono_right_mem a hmem))
+  inductive Mem : Tree → Tree → Prop where
+    | mem_succ {x y : Tree} : Subset x y → Subset y x → Mem x (.succ y)
+    | mem_sup {x : Tree} {f : ℕ₀ → Tree} (n : ℕ₀) : Subset x (f n) → Subset (f n) x → Mem x (.sup f)
 end
 
-end PreOrd
+def Equiv (x y : Tree) : Prop := Subset x y ∧ Subset y x
+
+theorem Subset_refl (x : Tree) : Subset x x :=
+  match x with
+  | .zero => .zero_subset _
+  | .succ x' => .succ_subset (.mem_succ (Subset_refl x') (Subset_refl x'))
+  | .sup f => .sup_subset fun n => .mem_sup n (Subset_refl (f n)) (Subset_refl (f n))
+
+theorem mem_self_succ (x : Tree) : Mem x (.succ x) :=
+  .mem_succ (Subset_refl x) (Subset_refl x)
+
+def trans_all (y : Tree) :
+  (∀ {x z}, Subset x y → Subset y z → Subset x z) ∧
+  (∀ {x z}, Mem x y → Subset y z → Mem x z) ∧
+  (∀ {x z}, Subset y x → Subset x y → Mem y z → Mem x z) :=
+  let mem_sub : ∀ {x z}, Mem x y → Subset y z → Mem x z := fun {x z} h1 h2 =>
+    match y, z, h2 with
+    | _, _, .zero_subset _ => nomatch h1
+    | _, _, @Subset.succ_subset a _ hmem2 =>
+      match h1 with
+      | @Mem.mem_succ _ _ hx_a ha_x => (trans_all a).2.2 ha_x hx_a hmem2
+    | _, _, @Subset.sup_subset f _ hsub2 =>
+      match h1 with
+      | @Mem.mem_sup _ _ n hx_fn hfn_x => (trans_all (f n)).2.2 hfn_x hx_fn (hsub2 n)
+
+  let sub_sub : ∀ {x z}, Subset x y → Subset y z → Subset x z := fun {x z} h1 h2 =>
+    match x, h1 with
+    | _, .zero_subset _ => .zero_subset _
+    | _, @Subset.succ_subset d _ hmem => .succ_subset (mem_sub hmem h2)
+    | _, @Subset.sup_subset f _ hsub => .sup_subset fun n => mem_sub (hsub n) h2
+
+  let eq_mem : ∀ {x z}, Subset y x → Subset x y → Mem y z → Mem x z := fun {x z} hyx hxy hyz =>
+    match z, hyz with
+    | _, @Mem.mem_succ _ b hyb hby =>
+      .mem_succ (sub_sub hxy hyb) (sub_sub hby hyx)
+    | _, @Mem.mem_sup _ g n hyg hgy =>
+      .mem_sup n (sub_sub hxy hyg) (sub_sub hgy hyx)
+
+  ⟨sub_sub, mem_sub, eq_mem⟩

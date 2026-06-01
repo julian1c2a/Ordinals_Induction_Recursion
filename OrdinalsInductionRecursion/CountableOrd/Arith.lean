@@ -8,6 +8,7 @@ import OrdinalsInductionRecursion.CountableOrd.Ordinals
 import OrdinalsInductionRecursion.CountableOrd.OrdinalsLattice
 import OrdinalsInductionRecursion.CountableOrd.WellOrder
 
+namespace CountableOrd
 namespace PreOrd
 
 /-- Suma de pre-ordinales -/
@@ -187,3 +188,4 @@ noncomputable instance : Pow Ordinal Ordinal where
   pow := pow
 
 end Ordinal
+end CountableOrd
