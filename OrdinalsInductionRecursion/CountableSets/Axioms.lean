@@ -144,4 +144,44 @@ def omegaTree : Tree := .sup natTree
 
 def omega : HCSet := Quotient.mk CountableSets.Setoid omegaTree
 
+-- ══════════════════════════════════════════════════════════════════
+-- § 4. Axioma de Reemplazo
+-- ══════════════════════════════════════════════════════════════════
+
+def replTree (f : Tree → Tree) (a : Tree) : Tree :=
+  match a with
+  | .zero => .zero
+  | .succ c => .succ (f c)
+  | .sup g => .sup fun n => f (g n)
+
+theorem replTree_respects (f : Tree → Tree) (hf : ∀ x y, Equiv x y → Equiv (f x) (f y)) (a1 a2 : Tree) (ha : Equiv a1 a2) : Equiv (replTree f a1) (replTree f a2) := by
+  sorry
+
+def repl (f : Tree → Tree) (hf : ∀ x y, Equiv x y → Equiv (f x) (f y)) (a : HCSet) : HCSet :=
+  Quotient.lift (fun x => Quotient.mk Setoid (replTree f x))
+    (fun _ _ h => Quotient.sound (replTree_respects f hf _ _ h)) a
+
+-- ══════════════════════════════════════════════════════════════════
+-- § 5. Axioma de Separación (Decidible)
+-- ══════════════════════════════════════════════════════════════════
+open Classical
+
+def sepTree (P : Tree → Prop) [∀ x, Decidable (P x)] (a : Tree) : Tree :=
+  match a with
+  | .zero => .zero
+  | .succ c => if P c then .succ c else .zero
+  | .sup f =>
+    if h : ∃ n, P (f n) then
+      let first_valid := epsilon (fun n => P (f n))
+      .sup fun n => if P (f n) then f n else f first_valid
+    else
+      .zero
+
+theorem sepTree_respects (P : Tree → Prop) [∀ x, Decidable (P x)] (hP : ∀ x y, Equiv x y → (P x ↔ P y)) (a1 a2 : Tree) (ha : Equiv a1 a2) : Equiv (sepTree P a1) (sepTree P a2) := by
+  sorry
+
+def sep (P : Tree → Prop) [∀ x, Decidable (P x)] (hP : ∀ x y, Equiv x y → (P x ↔ P y)) (a : HCSet) : HCSet :=
+  Quotient.lift (fun x => Quotient.mk Setoid (sepTree P x))
+    (fun _ _ h => Quotient.sound (sepTree_respects P hP _ _ h)) a
+
 end CountableSets

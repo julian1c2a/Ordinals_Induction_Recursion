@@ -48,6 +48,16 @@ def sInter (x : Ordinal) : Ordinal :=
 -- Constantes Base
 -- ==========================================
 
+
+def zero : Ordinal := Quotient.mk PreOrd.Setoid PreOrd.zero
+
+def succ (x : Ordinal) : Ordinal :=
+  Quotient.lift (fun a => Quotient.mk PreOrd.Setoid (PreOrd.succ a)) (fun _ _ h => Quotient.sound (PreOrd.succ_respects h)) x
+
+def IsLimit (x : Ordinal) : Prop := x ≠ zero ∧ ∀ y < x, succ y < x
+
+
+
 def fromNat (n : ℕ₀) : Ordinal := Quotient.mk PreOrd.Setoid (PreOrd.preFromNat n)
 
 def omega : Ordinal := Quotient.mk PreOrd.Setoid PreOrd.preomega

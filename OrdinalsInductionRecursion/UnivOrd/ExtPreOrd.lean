@@ -21,6 +21,10 @@ theorem Mem_respects {x₁ x₂ y₁ y₂ : PreOrd} (hx : Equiv x₁ x₂) (hy :
   propext ⟨fun h => Mem_Subset_trans (Subset_Mem_trans hx.right h) hy.left,
            fun h => Mem_Subset_trans (Subset_Mem_trans hx.left h) hy.right⟩
 
+theorem succ_respects {a1 a2 : PreOrd} (ha : Equiv a1 a2) : Equiv (succ a1) (succ a2) :=
+  ⟨Subset.succ_subset (Subset_Mem_trans ha.left (Mem_self_succ a2)),
+   Subset.succ_subset (Subset_Mem_trans ha.right (Mem_self_succ a1))⟩
+
 
 -- ==========================================
 -- Intersección Parcial

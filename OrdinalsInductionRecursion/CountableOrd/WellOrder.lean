@@ -64,5 +64,11 @@ theorem lt_trichotomy (x y : Ordinal) : x < y ∨ x = y ∨ y < x :=
       | Or.inl h_b_lt_a => Or.inr (Or.inr h_b_lt_a)
       | Or.inr h_a_le_b => Or.inr (Or.inl (Quotient.sound ⟨h_a_le_b, h_b_le_a⟩))
 
+theorem lt_irrefl (x : Ordinal) : ¬ x < x := by
+  intro h
+  have wf : Acc (· < ·) x := well_founded_lt.apply x
+  induction wf with
+  | intro x' _ ih => exact ih x' h h
+
 end Ordinal
 end CountableOrd

@@ -10,6 +10,10 @@ universe u
 
 namespace UnivSets
 
+noncomputable section
+
+local instance (p : Prop) : Decidable p := Classical.propDecidable p
+
 open Tree
 
 -- ==========================================
@@ -198,5 +202,155 @@ theorem exists_mem_of_mem_union {y A : USet.{u}} (hya : y ∈ union A) : ∃ x, 
   rename_i y_tree
   have ⟨x_tree, hxA, hyx⟩ := exists_mem_of_mem_unionTree hya
   exact ⟨Quotient.mk Setoid x_tree, hxA, hyx⟩
+
+-- ==========================================
+-- 4. Conjunto Potencia (Power Set)
+-- ==========================================
+
+def powersetTree (a : Tree.{u}) : Tree.{u} :=
+  match a with
+  | @sup α f => sup (α := α → Bool) fun g =>
+      sup (α := {i : α // g i = true}) fun j => f j.val
+
+theorem powersetTree_respects (a1 a2 : Tree.{u}) (ha : Tree.Equiv a1 a2) : Tree.Equiv (powersetTree a1) (powersetTree a2) := by
+  cases a1; cases a2
+  rename_i α1 f1 α2 f2
+  apply Tree.Equiv.intro
+  · apply Tree.Subset.sup_subset
+    intro g1
+    let g2 : α2 → Bool := fun y =>
+      if h : ∃ x : α1, g1 x = true ∧ Tree.Equiv (f1 x) (f2 y) then true else false
+    apply Tree.Mem.mem_sup g2
+    · apply Tree.Subset.sup_subset
+      intro i
+      have h1 := i.property
+      have h_sub := ha.left
+      cases h_sub; rename_i h_mem_func
+      have hmem := h_mem_func i.val
+      cases hmem
+      rename_i j hsub1 hsub2
+      have hequiv : Tree.Equiv (f1 i.val) (f2 j) := ⟨hsub1, hsub2⟩
+      have h_exists : ∃ x : α1, g1 x = true ∧ Tree.Equiv (f1 x) (f2 j) := ⟨i.val, h1, hequiv⟩
+      have hg2 : g2 j = true := by
+        dsimp [g2]
+        rw [if_pos h_exists]
+      exact Tree.Mem.mem_sup ⟨j, hg2⟩ hsub1 hsub2
+    · apply Tree.Subset.sup_subset
+      intro j
+      have h2 := j.property
+      dsimp [g2] at h2
+      split at h2
+      · rename_i h_exists
+        rcases h_exists with ⟨x, hg1, hequiv⟩
+        exact Tree.Mem.mem_sup ⟨x, hg1⟩ hequiv.right hequiv.left
+      · contradiction
+  · apply Tree.Subset.sup_subset
+    intro g2
+    let g1 : α1 → Bool := fun x =>
+      if h : ∃ y : α2, g2 y = true ∧ Tree.Equiv (f1 x) (f2 y) then true else false
+    apply Tree.Mem.mem_sup g1
+    · apply Tree.Subset.sup_subset
+      intro j
+      have h2 := j.property
+      have h_sub := ha.right
+      cases h_sub; rename_i h_mem_func
+      have hmem := h_mem_func j.val
+      cases hmem
+      rename_i i hsub1 hsub2
+      have hequiv : Tree.Equiv (f1 i) (f2 j.val) := ⟨hsub2, hsub1⟩
+      have h_exists : ∃ y : α2, g2 y = true ∧ Tree.Equiv (f1 i) (f2 y) := ⟨j.val, h2, hequiv⟩
+      have hg1 : g1 i = true := by
+        dsimp [g1]
+        rw [if_pos h_exists]
+      exact Tree.Mem.mem_sup ⟨i, hg1⟩ hsub1 hsub2
+    · apply Tree.Subset.sup_subset
+      intro i
+      have h1 := i.property
+      dsimp [g1] at h1
+      split at h1
+      · rename_i h_exists
+        rcases h_exists with ⟨y, hg2, hequiv⟩
+        exact Tree.Mem.mem_sup ⟨y, hg2⟩ hequiv.left hequiv.right
+      · contradiction
+
+def powerset (a : USet.{u}) : USet.{u} :=
+  Quotient.lift (fun x => Quotient.mk Tree.Setoid (powersetTree x))
+    (fun _ _ h => Quotient.sound (powersetTree_respects _ _ h)) a
+
+-- ==========================================
+-- 5. Axioma de Reemplazo
+-- ==========================================
+
+def replTree (f : Tree.{u} → Tree.{u}) (a : Tree.{u}) : Tree.{u} :=
+  match a with
+  | @sup α g => sup (α := α) fun i => f (g i)
+
+theorem replTree_respects (f : Tree.{u} → Tree.{u}) (hf : ∀ x y, Tree.Equiv x y → Tree.Equiv (f x) (f y)) (a1 a2 : Tree.{u}) (ha : Tree.Equiv a1 a2) : Tree.Equiv (replTree f a1) (replTree f a2) := by
+  cases a1; cases a2
+  rename_i α1 g1 α2 g2
+  apply Tree.Equiv.intro
+  · apply Tree.Subset.sup_subset
+    intro i
+    have h_sub := ha.left
+    cases h_sub; rename_i h_mem_func
+    have hmem := h_mem_func i
+    cases hmem
+    rename_i j hsub1 hsub2
+    have hequiv : Tree.Equiv (g1 i) (g2 j) := ⟨hsub1, hsub2⟩
+    have hequiv_f := hf _ _ hequiv
+    exact Tree.Mem.mem_sup j hequiv_f.left hequiv_f.right
+  · apply Tree.Subset.sup_subset
+    intro j
+    have h_sub := ha.right
+    cases h_sub; rename_i h_mem_func
+    have hmem := h_mem_func j
+    cases hmem
+    rename_i i hsub1 hsub2
+    have hequiv : Tree.Equiv (g2 j) (g1 i) := ⟨hsub1, hsub2⟩
+    have hequiv_f := hf _ _ hequiv
+    exact Tree.Mem.mem_sup i hequiv_f.left hequiv_f.right
+
+def repl (f : Tree.{u} → Tree.{u}) (hf : ∀ x y, Tree.Equiv x y → Tree.Equiv (f x) (f y)) (a : USet.{u}) : USet.{u} :=
+  Quotient.lift (fun x => Quotient.mk Tree.Setoid (replTree f x))
+    (fun _ _ h => Quotient.sound (replTree_respects f hf _ _ h)) a
+
+-- ==========================================
+-- 6. Axioma de Separación (Decidible)
+-- ==========================================
+
+def sepTree (P : Tree.{u} → Prop) [∀ x, Decidable (P x)] (a : Tree.{u}) : Tree.{u} :=
+  match a with
+  | @sup α f => sup (α := {i : α // P (f i)}) fun j => f j.val
+
+theorem sepTree_respects (P : Tree.{u} → Prop) [∀ x, Decidable (P x)] (hP : ∀ x y, Tree.Equiv x y → (P x ↔ P y)) (a1 a2 : Tree.{u}) (ha : Tree.Equiv a1 a2) : Tree.Equiv (sepTree P a1) (sepTree P a2) := by
+  cases a1; cases a2
+  rename_i α1 f1 α2 f2
+  apply Tree.Equiv.intro
+  · apply Tree.Subset.sup_subset
+    intro i
+    have h_sub := ha.left
+    cases h_sub; rename_i h_mem_func
+    have hmem := h_mem_func i.val
+    cases hmem
+    rename_i j hsub1 hsub2
+    have hequiv : Tree.Equiv (f1 i.val) (f2 j) := ⟨hsub1, hsub2⟩
+    have hP2 : P (f2 j) := (hP _ _ hequiv).mp i.property
+    exact Tree.Mem.mem_sup ⟨j, hP2⟩ hsub1 hsub2
+  · apply Tree.Subset.sup_subset
+    intro j
+    have h_sub := ha.right
+    cases h_sub; rename_i h_mem_func
+    have hmem := h_mem_func j.val
+    cases hmem
+    rename_i i hsub1 hsub2
+    have hequiv : Tree.Equiv (f2 j.val) (f1 i) := ⟨hsub1, hsub2⟩
+    have hP1 : P (f1 i) := (hP _ _ hequiv).mp j.property
+    exact Tree.Mem.mem_sup ⟨i, hP1⟩ hsub1 hsub2
+
+def sep (P : Tree.{u} → Prop) [∀ x, Decidable (P x)] (hP : ∀ x y, Tree.Equiv x y → (P x ↔ P y)) (a : USet.{u}) : USet.{u} :=
+  Quotient.lift (fun x => Quotient.mk Tree.Setoid (sepTree P x))
+    (fun _ _ h => Quotient.sound (sepTree_respects P hP _ _ h)) a
+
+end
 
 end UnivSets
