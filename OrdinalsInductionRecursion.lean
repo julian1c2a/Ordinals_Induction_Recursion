@@ -12,3 +12,7 @@ import OrdinalsInductionRecursion.UnivSets.Axioms
 
 import OrdinalsInductionRecursion.CountableOrd.Induction
 import OrdinalsInductionRecursion.UnivOrd.Induction
+
+import OrdinalsInductionRecursion.UnivOrd.Inaccessible
+
+import OrdinalsInductionRecursion.TarskiOrd.PreOrd
