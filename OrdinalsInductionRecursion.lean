@@ -16,3 +16,6 @@ import OrdinalsInductionRecursion.UnivOrd.Induction
 import OrdinalsInductionRecursion.UnivOrd.Inaccessible
 
 import OrdinalsInductionRecursion.TarskiOrd.PreOrd
+
+import OrdinalsInductionRecursion.TarskiOrd.Ordinals
+import OrdinalsInductionRecursion.TarskiOrd.Universes

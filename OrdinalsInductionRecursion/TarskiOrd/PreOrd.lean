@@ -1,5 +1,8 @@
+import Peano
 import OrdinalsInductionRecursion.TarskiOrd.UCode
 import OrdinalsInductionRecursion.TarskiOrd.El
+
+open Peano
 
 namespace TarskiOrd
 
@@ -14,4 +17,151 @@ inductive TPreOrd : Type
   | succ : TPreOrd → TPreOrd
   | sup  : (c : UCode) → (El c → TPreOrd) → TPreOrd
 
+namespace TPreOrd
+
+mutual
+  /-- Relación de subconjunto (≤) para los pre-ordinales de Tarski -/
+  inductive Subset : TPreOrd → TPreOrd → Prop where
+    | zero_subset (y : TPreOrd) : Subset zero y
+    | succ_subset {x y : TPreOrd} : Mem x y → Subset (succ x) y
+    | sup_subset {c : UCode} {f : El c → TPreOrd} {y : TPreOrd} : (∀ a, Subset (f a) y) → Subset (sup c f) y
+
+  /-- Relación de pertenencia (<) para los pre-ordinales de Tarski -/
+  inductive Mem : TPreOrd → TPreOrd → Prop where
+    | mem_succ {x y : TPreOrd} : Subset x y → Mem x (succ y)
+    | mem_sup {c : UCode} {x : TPreOrd} {f : El c → TPreOrd} (a : El c) : Mem x (f a) → Mem x (sup c f)
+end
+
+instance : Membership TPreOrd TPreOrd := ⟨Mem⟩
+instance : HasSubset TPreOrd := ⟨Subset⟩
+
+/-- Igualdad extensional (equivalencia) de pre-ordinales -/
+def Equiv (x y : TPreOrd) : Prop := Subset x y ∧ Subset y x
+
+-- ==========================================
+-- Lemas de Equivalencia (Setoid)
+-- ==========================================
+
+theorem Subset_sup {y z : TPreOrd} {c : UCode} {f : El c → TPreOrd}
+  (h : Subset y z) (a : El c) (hz : z = f a) :
+    Subset y (sup c f)
+      :=
+  match y, z, h with
+  | _, _, .zero_subset _ => .zero_subset _
+  | _, _, .succ_subset hmem => .succ_subset (Mem.mem_sup a (hz ▸ hmem))
+  | _, _, .sup_subset hsub => .sup_subset fun k => Subset_sup (hsub k) a hz
+
+theorem Subset_refl
+  (x : TPreOrd) :
+    Subset x x
+      :=
+  match x with
+  | .zero => .zero_subset _
+  | .succ x' => .succ_subset (.mem_succ (Subset_refl x'))
+  | .sup _c f => .sup_subset fun a => Subset_sup (Subset_refl (f a)) a rfl
+
+theorem Mem_self_succ
+  (x : TPreOrd) :
+    Mem x (succ x)
+      :=
+  .mem_succ (Subset_refl x)
+
+def trans_all
+  (x : TPreOrd) :
+    (∀ {y z}, Subset x y → Subset y z → Subset x z) ∧
+    (∀ {y z}, Mem x y → Subset y z → Mem x z) ∧
+    (∀ {y z}, Subset x y → Mem y z → Mem x z)
+      :=
+  let sub_sub : ∀ {y z}, Subset x y → Subset y z → Subset x z :=
+    match x with
+    | .zero => fun _ _ => .zero_subset _
+    | .succ x' => fun h1 h2 =>
+      match h1 with
+      | @Subset.succ_subset _ _ hmem1 => .succ_subset ((trans_all x').2.1 hmem1 h2)
+    | .sup _c f => fun h1 h2 =>
+      match h1 with
+      | @Subset.sup_subset _ _ _ hsub1 => .sup_subset fun a => (trans_all (f a)).1 (hsub1 a) h2
+
+  let rec sub_mem {y z} (h1 : Subset x y) (h2 : Mem y z) : Mem x z :=
+    match y, z, h2 with
+    | _, _, .mem_succ hsub2 => .mem_succ (sub_sub h1 hsub2)
+    | _, _, .mem_sup a hmem2 => .mem_sup a (sub_mem h1 hmem2)
+
+  let rec mem_sub {y z} (h1 : Mem x y) (h2 : Subset y z) : Mem x z :=
+    match y, z, h2 with
+    | _, _, .zero_subset _ => nomatch h1
+    | _, _, @Subset.succ_subset y' _ hmem2 =>
+      match h1 with
+      | @Mem.mem_succ _ _ hsub1 => sub_mem hsub1 hmem2
+    | _, _, @Subset.sup_subset _ g _ hsub2 =>
+      match h1 with
+      | @Mem.mem_sup _ _ _ a hmem1 => mem_sub hmem1 (hsub2 a)
+
+  ⟨sub_sub, mem_sub, sub_mem⟩
+
+theorem Subset_trans {x y z : TPreOrd} (h1 : Subset x y) (h2 : Subset y z) : Subset x z :=
+  (trans_all x).1 h1 h2
+
+theorem Mem_Subset_trans {x y z : TPreOrd} (h1 : Mem x y) (h2 : Subset y z) : Mem x z :=
+  (trans_all x).2.1 h1 h2
+
+theorem Subset_Mem_trans {x y z : TPreOrd} (h1 : Subset x y) (h2 : Mem y z) : Mem x z :=
+  (trans_all x).2.2 h1 h2
+
+def trans_y (y : TPreOrd) :
+  (Subset y (succ y)) ∧
+  (∀ {x}, Mem x y → Subset x y) :=
+  match y with
+  | .zero =>
+    ⟨Subset.zero_subset _, fun h => nomatch h⟩
+  | .succ a =>
+    let ih := trans_y a
+    let self_succ := Subset.succ_subset (Mem.mem_succ ih.1)
+    let rec sub_succ_a {x} (h : Subset x a) : Subset x (succ a) :=
+      match x, h with
+      | _, Subset.zero_subset _ => Subset.zero_subset _
+      | _, @Subset.succ_subset z _ hmem =>
+        Subset.succ_subset (Mem.mem_succ (ih.2 hmem))
+      | _, @Subset.sup_subset _ g _ hsub =>
+        Subset.sup_subset fun j => sub_succ_a (hsub j)
+    let mem_sub := fun {x} (h : Mem x (succ a)) =>
+      match x, h with
+      | _, Mem.mem_succ hsub => sub_succ_a hsub
+    ⟨self_succ, mem_sub⟩
+  | .sup c f =>
+    let ih := fun i => trans_y (f i)
+    let mem_sub := fun {x} (h : Mem x (sup c f)) =>
+      match x, h with
+      | _, Mem.mem_sup i hmem => Subset_sup ((ih i).2 hmem) i rfl
+    let rec sub_succ_sup {x} (h : Subset x (sup c f)) : Subset x (succ (sup c f)) :=
+      match x, h with
+      | _, Subset.zero_subset _ => Subset.zero_subset _
+      | _, @Subset.succ_subset z _ hmem =>
+        Subset.succ_subset (Mem.mem_succ (mem_sub hmem))
+      | _, @Subset.sup_subset _ g _ hsub =>
+        Subset.sup_subset fun j => sub_succ_sup (hsub j)
+    let self_succ := Subset.sup_subset fun i => sub_succ_sup (Subset_sup (Subset_refl _) i rfl)
+    ⟨self_succ, mem_sub⟩
+
+theorem mem_implies_subset {x y : TPreOrd} (h : Mem x y) : Subset x y :=
+  (trans_y y).2 h
+
+theorem Equiv_refl (x : TPreOrd) : Equiv x x :=
+  ⟨Subset_refl x, Subset_refl x⟩
+
+theorem Equiv_symm {x y : TPreOrd} (h : Equiv x y) : Equiv y x :=
+  ⟨h.right, h.left⟩
+
+theorem Equiv_trans {x y z : TPreOrd} (h1 : Equiv x y) (h2 : Equiv y z) : Equiv x z :=
+  ⟨Subset_trans h1.left h2.left, Subset_trans h2.right h1.right⟩
+
+instance Setoid : Setoid TPreOrd where
+  r := Equiv
+  iseqv := {
+    refl := Equiv_refl
+    symm := Equiv_symm
+    trans := Equiv_trans
+  }
+
+end TPreOrd
 end TarskiOrd
