@@ -25,6 +25,8 @@ import OrdinalsInductionRecursion.DybjerOrd.Alephs
 
 import OrdinalsInductionRecursion.CountableSets.HCSet
 import OrdinalsInductionRecursion.UnivSets.Axioms
+import OrdinalsInductionRecursion.TarskiSet.Axioms
+import OrdinalsInductionRecursion.DybjerSet.Axioms
 import OrdinalsInductionRecursion.UnivSets.Lift
 import OrdinalsInductionRecursion.UnivOrd.Ordinals
 import OrdinalsInductionRecursion.UnivOrd.WellOrder
