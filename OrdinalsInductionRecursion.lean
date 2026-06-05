@@ -1,21 +1,28 @@
-import OrdinalsInductionRecursion.UnivOrd.Ordinals
-import OrdinalsInductionRecursion.UnivOrd.OrdinalsLattice
-import OrdinalsInductionRecursion.UnivOrd.WellOrder
-import OrdinalsInductionRecursion.UnivOrd.Arith
+-- This module serves as the root of the `OrdinalsInductionRecursion` library.
+-- Import modules here that should be built as part of the library.
+import OrdinalsInductionRecursion.Basic
+import OrdinalsInductionRecursion.TarskiOrd.UCode
+import OrdinalsInductionRecursion.TarskiOrd.Universes
+import OrdinalsInductionRecursion.TarskiOrd.PreOrd
+import OrdinalsInductionRecursion.TarskiOrd.Cardinals
+import OrdinalsInductionRecursion.TarskiOrd.Ordinals
+import OrdinalsInductionRecursion.TarskiOrd.Transfinite
+import OrdinalsInductionRecursion.TarskiOrd.Arith
+import OrdinalsInductionRecursion.TarskiOrd.Strict
+import OrdinalsInductionRecursion.TarskiOrd.Alephs
+import OrdinalsInductionRecursion.TarskiOrd.Univ
+import OrdinalsInductionRecursion.TarskiOrd.DependentOrd
+
 import OrdinalsInductionRecursion.CountableSets.HCSet
+import OrdinalsInductionRecursion.UnivSets.Axioms
+import OrdinalsInductionRecursion.UnivSets.Lift
+import OrdinalsInductionRecursion.UnivOrd.Ordinals
+import OrdinalsInductionRecursion.UnivOrd.WellOrder
+import OrdinalsInductionRecursion.UnivOrd.OrdinalsLattice
+import OrdinalsInductionRecursion.UnivOrd.Arith
 import OrdinalsInductionRecursion.UnivOrd.Isomorphism
 import OrdinalsInductionRecursion.UnivOrd.Cardinals
-import OrdinalsInductionRecursion.UnivSets.Lift
-import OrdinalsInductionRecursion.UnivOrd.Lift
-
-import OrdinalsInductionRecursion.UnivSets.Axioms
-
-import OrdinalsInductionRecursion.CountableOrd.Induction
 import OrdinalsInductionRecursion.UnivOrd.Induction
-
 import OrdinalsInductionRecursion.UnivOrd.Inaccessible
-
-import OrdinalsInductionRecursion.TarskiOrd.PreOrd
-
-import OrdinalsInductionRecursion.TarskiOrd.Ordinals
-import OrdinalsInductionRecursion.TarskiOrd.Universes
+import OrdinalsInductionRecursion.UnivOrd.Lift
+import OrdinalsInductionRecursion.CountableOrd.Induction

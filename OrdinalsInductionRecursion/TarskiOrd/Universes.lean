@@ -1,4 +1,5 @@
 import OrdinalsInductionRecursion.TarskiOrd.Ordinals
+import OrdinalsInductionRecursion.TarskiOrd.Arith
 
 namespace TarskiOrd
 
@@ -36,13 +37,13 @@ def omega : TOrdinal :=
 /-- 
 Para modelar un universo, necesitamos asignar a cada tipo en UCode
 su supremo ordinal correspondiente.
-Para simplificar, asignaremos a cada código un ordinal acotador.
+Ahora usamos la aritmética constructiva real para acotar los tipos.
 -/
 def code_bound : UCode → TPreOrd
   | .unit => succ zero
   | .nat => omega_pre
-  | .sum a _b => succ (sup .unit (fun _ => code_bound a)) -- Simplificación para no calcular la suma real
-  | .arrow _a b => succ (sup .unit (fun _ => code_bound b)) 
+  | .sum a b => code_bound a + code_bound b
+  | .arrow a b => code_bound b * code_bound a
   | .univ _n => succ zero -- Un nivel base para evitar ciclos
 
 /-- 
@@ -56,5 +57,13 @@ def omega_univ_0_pre : TPreOrd :=
 
 def omega_univ_0 : TOrdinal :=
   Quotient.mk Setoid omega_univ_0_pre
+
+theorem omega_pre_mem_omega_univ_0_pre : Mem omega_pre omega_univ_0_pre :=
+  Mem.mem_sup (UCode.sum .nat .unit) (
+    Mem.mem_succ (Subset_refl _)
+  )
+
+theorem omega_mem_omega_univ_0 : omega ∈ omega_univ_0 :=
+  omega_pre_mem_omega_univ_0_pre
 
 end TarskiOrd
