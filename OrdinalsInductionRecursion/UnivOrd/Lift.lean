@@ -8,6 +8,8 @@ import OrdinalsInductionRecursion.UnivOrd.Ordinals
 
 universe u v
 
+set_option linter.unusedVariables false
+
 namespace UnivOrd
 
 open PreOrd

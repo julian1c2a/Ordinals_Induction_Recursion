@@ -78,14 +78,14 @@ structure Injection (α β : Type) where
 def InjectsInto (x y : TOrdinal) : Prop := Nonempty (Injection (Elements x) (Elements y))
 
 theorem Mem_Subset_trans {x y z : TOrdinal} : TOrdinal.Mem x y → TOrdinal.Subset y z → TOrdinal.Mem x z :=
-  Quotient.inductionOn₃ x y z fun a b c hab hbc => TPreOrd.Mem_Subset_trans hab hbc
+  Quotient.inductionOn₃ x y z fun _ _ _ hab hbc => TPreOrd.Mem_Subset_trans hab hbc
 
 /-- Si x ⊆ y, la inclusión natural nos da una inyección de los elementos de x en y. -/
 theorem Subset_implies_InjectsInto {x y : TOrdinal} (h : TOrdinal.Subset x y) : InjectsInto x y :=
   ⟨{ toFun := fun a => ⟨a.val, Mem_Subset_trans a.property h⟩,
      inj' := fun ⟨aval, aprop⟩ ⟨bval, bprop⟩ heq => by
        have hval : aval = bval := by injection heq
-       exact Subtype.eq hval }⟩
+       exact Subtype.ext hval }⟩
 
 /-- El Teorema de Hartogs axiomatizado. 
   Garantiza que para todo ordinal x, existe algún ordinal γ que no se puede inyectar en x. -/

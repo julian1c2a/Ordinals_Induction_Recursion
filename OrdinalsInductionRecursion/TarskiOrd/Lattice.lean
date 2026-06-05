@@ -67,7 +67,7 @@ def sUnion (x : TOrdinal) : TOrdinal :=
   Quotient.liftOn x (fun a => (Quotient.mk TPreOrd.Setoid (preord_sUnion a) : TOrdinal))
     (fun _ _ h => Quotient.sound ⟨sUnion_Subset h.left, sUnion_Subset h.right⟩)
 
-def sInter (x : TOrdinal) : TOrdinal :=
+def sInter (_ : TOrdinal) : TOrdinal :=
   (Quotient.mk TPreOrd.Setoid zero : TOrdinal)
 
 theorem sInter_eq_zero (x : TOrdinal) : sInter x = (Quotient.mk TPreOrd.Setoid zero : TOrdinal) := rfl

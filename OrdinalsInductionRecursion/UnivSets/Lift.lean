@@ -8,6 +8,8 @@ import OrdinalsInductionRecursion.UnivSets.Tree
 
 universe u v
 
+set_option linter.unusedVariables false
+
 namespace UnivSets
 
 open Tree

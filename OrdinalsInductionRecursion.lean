@@ -1,6 +1,5 @@
 -- This module serves as the root of the `OrdinalsInductionRecursion` library.
 -- Import modules here that should be built as part of the library.
-import OrdinalsInductionRecursion.Basic
 import OrdinalsInductionRecursion.TarskiOrd.UCode
 import OrdinalsInductionRecursion.TarskiOrd.Universes
 import OrdinalsInductionRecursion.TarskiOrd.PreOrd
@@ -8,7 +7,9 @@ import OrdinalsInductionRecursion.TarskiOrd.Cardinals
 import OrdinalsInductionRecursion.TarskiOrd.Ordinals
 import OrdinalsInductionRecursion.TarskiOrd.Transfinite
 import OrdinalsInductionRecursion.TarskiOrd.Arith
-import OrdinalsInductionRecursion.TarskiOrd.Strict
+import OrdinalsInductionRecursion.TarskiOrd.Order
+import OrdinalsInductionRecursion.TarskiOrd.Lattice
+import OrdinalsInductionRecursion.TarskiOrd.El
 import OrdinalsInductionRecursion.TarskiOrd.Alephs
 import OrdinalsInductionRecursion.TarskiOrd.Univ
 import OrdinalsInductionRecursion.TarskiOrd.DependentOrd

@@ -26,6 +26,8 @@ inductive UCodeFam : Type → Type 1
   | sigma {A : Type} {B : A → Type} (a : UCodeFam A) (b : (x : A) → UCodeFam (B x)) : UCodeFam (Σ x, B x)
   | pi    {A : Type} {B : A → Type} (a : UCodeFam A) (b : (x : A) → UCodeFam (B x)) : UCodeFam ((x : A) → B x)
 
+namespace Dybjer
+
 /-- 
   Para conveniencia, empaquetamos el código junto con el tipo que decodifica.
   Esto es equivalente a nuestro antiguo `UCode`, pero ahora lleva su tipo `El` de forma nativa.
@@ -34,5 +36,7 @@ def UCode : Type 1 := Σ A : Type, UCodeFam A
 
 /-- Función extractora del tipo decodificado (antiguo `El`) -/
 def El (c : UCode) : Type := c.1
+
+end Dybjer
 
 end TarskiOrd

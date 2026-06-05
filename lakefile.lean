@@ -10,5 +10,5 @@ require aczelsettheory from git
   "https://github.com/julian1c2a/AczelSetTheory.git" @ "master"
 
 lean_lib «OrdinalsInductionRecursion» where
-  -- add library configuration options here
+  roots := #[`OrdinalsInductionRecursion]
 

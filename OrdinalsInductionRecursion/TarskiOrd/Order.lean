@@ -12,13 +12,13 @@ theorem acc_of_subset {y z : TPreOrd} (hz : Acc Mem z) (hsub : TPreOrd.Subset y 
 
 theorem preord_mem_acc (x : TPreOrd) : Acc Mem x :=
   match x with
-  | .zero => Acc.intro _ (fun y hy => nomatch hy)
+  | .zero => Acc.intro _ (fun _ hy => nomatch hy)
   | .succ x' => 
     let acc_x' := preord_mem_acc x'
     Acc.intro _ (fun y hy => 
       match y, hy with
       | _, Mem.mem_succ hsub => acc_of_subset acc_x' hsub)
-  | .sup c f => 
+  | .sup _ f => 
     let acc_f := fun a => preord_mem_acc (f a)
     Acc.intro _ (fun y hy => 
       match y, hy with
@@ -28,7 +28,7 @@ theorem preord_mem_wf : WellFounded Mem :=
   ⟨preord_mem_acc⟩
 
 theorem acc_lift {x : TPreOrd} (hx : Acc TPreOrd.Mem x) : Acc TOrdinal.Mem (Quotient.mk TPreOrd.Setoid x) :=
-  hx.recOn fun x' _ IH =>
+  hx.recOn fun _ _ IH =>
     Acc.intro _ fun y hy =>
       Quotient.inductionOn y (fun y' hy' => IH y' hy') hy
 

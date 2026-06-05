@@ -43,7 +43,7 @@ mutual
     match y with
     | .zero => h
     | .succ y' => TPreOrd.Subset.succ_subset (TPreOrd.Mem.mem_succ (add_Subset_left y' h))
-    | .sup c f => TPreOrd.Subset.sup_subset fun a => Subset_sup (add_Subset_left (f a) h) a rfl
+    | .sup _ f => TPreOrd.Subset.sup_subset fun a => Subset_sup (add_Subset_left (f a) h) a rfl
 end
 
 theorem add_respects_Equiv {x₁ x₂ y₁ y₂ : TPreOrd} (hx : Equiv x₁ x₂) (hy : Equiv y₁ y₂) : Equiv (add x₁ y₁) (add x₂ y₂) :=
@@ -82,7 +82,7 @@ mutual
         -- We know add a b <= add c d if a <= c and b <= d.
         -- We can compose add_Subset_left and add_Subset_right!
         Subset_trans (add_Subset_left x₁ (mul_Subset_left y' h)) (add_Subset_right (mul x₂ y') h)
-    | .sup c f => TPreOrd.Subset.sup_subset fun a => Subset_sup (mul_Subset_left (f a) h) a rfl
+    | .sup _ f => TPreOrd.Subset.sup_subset fun a => Subset_sup (mul_Subset_left (f a) h) a rfl
 end
 
 theorem mul_respects_Equiv {x₁ x₂ y₁ y₂ : TPreOrd} (hx : Equiv x₁ x₂) (hy : Equiv y₁ y₂) : Equiv (mul x₁ y₁) (mul x₂ y₂) :=
@@ -100,7 +100,7 @@ theorem y_Subset_add_left (x y : TPreOrd) : TPreOrd.Subset y (add x y) :=
   match y with
   | .zero => TPreOrd.Subset.zero_subset _
   | .succ y' => TPreOrd.Subset.succ_subset (TPreOrd.Mem.mem_succ (y_Subset_add_left x y'))
-  | .sup c f => TPreOrd.Subset.sup_subset fun a => Subset_sup (y_Subset_add_left x (f a)) a rfl
+  | .sup _ f => TPreOrd.Subset.sup_subset fun a => Subset_sup (y_Subset_add_left x (f a)) a rfl
 
 theorem z_Subset_mul (z x : TPreOrd) (hx : Mem zero x) : TPreOrd.Subset z (mul z x) :=
   match x, hx with
@@ -133,7 +133,7 @@ mutual
     | .zero => Subset_refl _
     | .succ y' => 
         Subset_trans (mul_Subset_left x₁ (exp_Subset_left y' h)) (mul_Subset_right (exp x₂ y') h)
-    | .sup c f => TPreOrd.Subset.sup_subset fun a => Subset_sup (exp_Subset_left (f a) h) a rfl
+    | .sup _ f => TPreOrd.Subset.sup_subset fun a => Subset_sup (exp_Subset_left (f a) h) a rfl
 end
 
 theorem exp_respects_Equiv {x₁ x₂ y₁ y₂ : TPreOrd} (hx : Equiv x₁ x₂) (hy : Equiv y₁ y₂) (hx_pos : Mem zero x₁) : Equiv (exp x₁ y₁) (exp x₂ y₂) :=
