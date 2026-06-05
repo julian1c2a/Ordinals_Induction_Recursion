@@ -13,6 +13,9 @@ import OrdinalsInductionRecursion.TarskiOrd.El
 import OrdinalsInductionRecursion.TarskiOrd.Alephs
 import OrdinalsInductionRecursion.DybjerOrd.Univ
 import OrdinalsInductionRecursion.DybjerOrd.PreOrd
+import OrdinalsInductionRecursion.DybjerOrd.Ordinals
+import OrdinalsInductionRecursion.DybjerOrd.Order
+import OrdinalsInductionRecursion.DybjerOrd.Lattice
 
 import OrdinalsInductionRecursion.CountableSets.HCSet
 import OrdinalsInductionRecursion.UnivSets.Axioms
