@@ -16,6 +16,9 @@ import OrdinalsInductionRecursion.DybjerOrd.PreOrd
 import OrdinalsInductionRecursion.DybjerOrd.Ordinals
 import OrdinalsInductionRecursion.DybjerOrd.Order
 import OrdinalsInductionRecursion.DybjerOrd.Lattice
+import OrdinalsInductionRecursion.DybjerOrd.Arith
+import OrdinalsInductionRecursion.DybjerOrd.Cardinals
+import OrdinalsInductionRecursion.DybjerOrd.Mostowski
 
 import OrdinalsInductionRecursion.CountableSets.HCSet
 import OrdinalsInductionRecursion.UnivSets.Axioms
