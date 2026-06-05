@@ -1,4 +1,4 @@
-import OrdinalsInductionRecursion.TarskiOrd.Univ
+import OrdinalsInductionRecursion.DybjerOrd.Univ
 
 /-
   Módulo: DependentOrd
@@ -6,7 +6,7 @@ import OrdinalsInductionRecursion.TarskiOrd.Univ
   Esto dota al sistema de Reemplazo (Tipos Dependientes Nativos).
 -/
 
-namespace TarskiOrd
+namespace DybjerOrd
 
 /--
   Pre-Ordinales Dependientes (DPreOrd)
@@ -34,4 +34,4 @@ inductive DMem : DPreOrd → DPreOrd → Prop where
       DMem x (f a) → DMem x (.sup c f)
 end
 
-end TarskiOrd
+end DybjerOrd
