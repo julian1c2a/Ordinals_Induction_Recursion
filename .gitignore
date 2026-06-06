@@ -1,1 +1,3 @@
 /.lake
+/test*.lean
+/scratch*.lean
