@@ -29,4 +29,6 @@ En los modelos constructivos de `TarskiOrd` y `DybjerOrd` hemos logrado asentar 
 2. **Número de Hartogs:** Proceso de asignación que prueba constructivamente que para cualquier conjunto/ordinal, existe un ordinal estrictamente mayor en cardinalidad.
 3. **Jerarquía $\aleph_\alpha$ (Alephs):** Evaluada estructuralmente sobre todos los ordinales límite y sucesor sin requerir del Axioma de Elección completo del metalenguaje.
 4. **Colapso de Mostowski:** Colapso de cualquier relación bien fundada a un ordinal nativo (restringido a tipos `UCode` en Tarski, y genérico en Dybjer).
-5. **Cofinalidad y Regularidad:** Maquinaria para determinar la cofinalidad de ordinales, clasificación de cardinales (regulares/singulares) y aritmética cardinal familiar (como base para el teorema de König).
+5. **Cofinalidad y Regularidad:** Maquinaria para determinar la cofinalidad de ordinales, clasificación de cardinales (regulares/singulares) y aritmética cardinal familiar.
+6. **Sucesión Beth ($\beth_\alpha$):** (Exclusivo de DybjerOrd) Aprovechando los constructores de familias dependientes (`pi` y `sigma`), se define explícitamente la exponenciación cardinal ($2^\kappa$) y la jerarquía de los números Beth.
+7. **Cardinales Fuertemente Inaccesibles:** (Exclusivo de DybjerOrd) Postulación de Universos de Grothendieck a través de una recursión estructural de límites fuertes, superando la barrera de la exponenciación.

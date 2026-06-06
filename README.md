@@ -38,6 +38,8 @@ Actualmente, el proyecto contiene el código base de cuatro pilares fundacionale
   - Aritmética Cardinal completa (Hartogs).
   - Colapso de Mostowski constructivo sobre cualquier relación bien fundada parametrizada.
   - Jerarquía de los Alephs ($\aleph_\alpha$) construida estructuralmente.
+  - **Teoría Cardinal Avanzada**: Exponenciación cardinal ($2^\kappa$) usando tipos dependientes y la sucesión de los números Beth ($\beth_\alpha$).
+  - **Cardinales Inaccesibles**: Implementación de Universos de Grothendieck explícitos ($\Omega_\alpha$) mediante axiomas de clausura límite.
 
 ---
 

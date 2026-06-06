@@ -26,6 +26,11 @@ import OrdinalsInductionRecursion.DybjerOrd.Mostowski
 import OrdinalsInductionRecursion.DybjerOrd.Transfinite
 import OrdinalsInductionRecursion.DybjerOrd.Universes
 import OrdinalsInductionRecursion.DybjerOrd.Alephs
+import OrdinalsInductionRecursion.DybjerOrd.CardinalsOrder
+import OrdinalsInductionRecursion.DybjerOrd.Cofinality
+import OrdinalsInductionRecursion.DybjerOrd.CardinalsFamily
+import OrdinalsInductionRecursion.DybjerOrd.Beth
+import OrdinalsInductionRecursion.DybjerOrd.Inaccessible
 
 import OrdinalsInductionRecursion.CountableSets.HCSet
 import OrdinalsInductionRecursion.UnivSets.Axioms
