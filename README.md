@@ -29,6 +29,8 @@ Actualmente, el proyecto contiene el código base de cuatro pilares fundacionale
   - Recursión e Inducción transfinita computable.
   - **Colapso de Mostowski Constructivo**: Mapeo isomórfico sobre cualquier relación bien fundada parametrizada por `UCode`.
   - **Teoría Cardinal Avanzada**: Aritmética cardinal, cofinalidad, regularidad y la maquinaria de familias cardinales para el Teorema de König.
+  - **Límites Estructurales de ZFC**: Implementación de Axiomas de Par, Adjunción e Infinito en `TarskiSet`, exponiendo y documentando matemáticamente la imposibilidad teórica de la Unión y el Conjunto Potencia sin tipos dependientes.
+  - **Embeddings Topológicos**: Inyecciones estrictas hacia arriba (`TarskiOrd ↪ UnivOrd` y `TarskiSet ↪ UnivSets`) validadas formalmente, respetando las restricciones de cardinalidad del Teorema de Cantor.
 
 ## 4. Universo de Dybjer (`DybjerOrd` / `DybjerSet`)
 - **Propósito**: Expandir Tarski para incluir verdaderos **tipos dependientes** (Pi y Sigma) manteniendo la computabilidad estricta.

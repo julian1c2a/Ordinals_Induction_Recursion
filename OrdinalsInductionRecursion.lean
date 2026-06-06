@@ -6,13 +6,20 @@ import OrdinalsInductionRecursion.TarskiOrd.PreOrd
 import OrdinalsInductionRecursion.TarskiOrd.Cardinals
 import OrdinalsInductionRecursion.TarskiOrd.Ordinals
 import OrdinalsInductionRecursion.TarskiOrd.Transfinite
-import OrdinalsInductionRecursion.TarskiOrd.Arith
-import OrdinalsInductionRecursion.TarskiOrd.Order
-import OrdinalsInductionRecursion.TarskiOrd.Lattice
+import OrdinalsInductionRecursion.TarskiOrd.Cofinality
+import OrdinalsInductionRecursion.TarskiOrd.Embeddings
+
+import OrdinalsInductionRecursion.TarskiSet.Tree
+import OrdinalsInductionRecursion.TarskiSet.Axioms
+import OrdinalsInductionRecursion.TarskiSet.Embeddings
+
 import OrdinalsInductionRecursion.TarskiOrd.El
 import OrdinalsInductionRecursion.TarskiOrd.Alephs
 import OrdinalsInductionRecursion.TarskiOrd.Mostowski
 import OrdinalsInductionRecursion.TarskiOrd.CardinalsOrder
+import OrdinalsInductionRecursion.TarskiOrd.Arith
+import OrdinalsInductionRecursion.TarskiOrd.Order
+import OrdinalsInductionRecursion.TarskiOrd.Lattice
 import OrdinalsInductionRecursion.TarskiOrd.Cofinality
 import OrdinalsInductionRecursion.TarskiOrd.CardinalsFamily
 import OrdinalsInductionRecursion.DybjerOrd.Univ
