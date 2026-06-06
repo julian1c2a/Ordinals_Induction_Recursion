@@ -27,6 +27,8 @@ Actualmente, el proyecto contiene el código base de cuatro pilares fundacionale
   - Replicación exitosa de toda el álgebra extensional sobre los códigos de Tarski sin usar `sorry`.
   - Construcción de los tipos límite $\omega$ y del **Primer Universo de Grothendieck** explícito ($\Omega_0$) puramente computables.
   - Recursión e Inducción transfinita computable.
+  - **Colapso de Mostowski Constructivo**: Mapeo isomórfico sobre cualquier relación bien fundada parametrizada por `UCode`.
+  - **Teoría Cardinal Avanzada**: Aritmética cardinal, cofinalidad, regularidad y la maquinaria de familias cardinales para el Teorema de König.
 
 ## 4. Universo de Dybjer (`DybjerOrd` / `DybjerSet`)
 - **Propósito**: Expandir Tarski para incluir verdaderos **tipos dependientes** (Pi y Sigma) manteniendo la computabilidad estricta.

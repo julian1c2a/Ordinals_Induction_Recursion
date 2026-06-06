@@ -24,7 +24,9 @@ La vía constructiva re-empaqueta la noción ordinal:
 Ambos mantienen el árbol firmemente plantado en un solo universo tipológico, blindando el cálculo de fugas paramétricas.
 
 ### Matemáticas Avanzadas Implementadas
-En el modelo definitivo de `DybjerOrd` hemos logrado asentar los hitos más complejos de la Teoría de Conjuntos de forma rigurosa y constructiva:
+En los modelos constructivos de `TarskiOrd` y `DybjerOrd` hemos logrado asentar los hitos más complejos de la Teoría de Conjuntos de forma rigurosa:
 1. **Inducción y Recursión Transfinita:** Haciendo uso del predicado de "Bien Fundado" nativo de Lean (`WellFounded.fix`), lo cual garantiza al kernel que nuestras operaciones sobre ramas hiperfinitas terminan algorítmicamente.
 2. **Número de Hartogs:** Proceso de asignación que prueba constructivamente que para cualquier conjunto/ordinal, existe un ordinal estrictamente mayor en cardinalidad.
-3. **Jerarquía $\aleph_\alpha$ (Alephs):** Evaluada estructuralmente sobre todos los ordinales límite y sucesor sin requerir del Axioma de Elección completo del metalenguaje, sino resolviéndolo intencionalmente sobre los índices lícitos del árbol.
+3. **Jerarquía $\aleph_\alpha$ (Alephs):** Evaluada estructuralmente sobre todos los ordinales límite y sucesor sin requerir del Axioma de Elección completo del metalenguaje.
+4. **Colapso de Mostowski:** Colapso de cualquier relación bien fundada a un ordinal nativo (restringido a tipos `UCode` en Tarski, y genérico en Dybjer).
+5. **Cofinalidad y Regularidad:** Maquinaria para determinar la cofinalidad de ordinales, clasificación de cardinales (regulares/singulares) y aritmética cardinal familiar (como base para el teorema de König).

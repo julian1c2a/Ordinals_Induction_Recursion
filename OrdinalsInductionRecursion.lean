@@ -11,6 +11,10 @@ import OrdinalsInductionRecursion.TarskiOrd.Order
 import OrdinalsInductionRecursion.TarskiOrd.Lattice
 import OrdinalsInductionRecursion.TarskiOrd.El
 import OrdinalsInductionRecursion.TarskiOrd.Alephs
+import OrdinalsInductionRecursion.TarskiOrd.Mostowski
+import OrdinalsInductionRecursion.TarskiOrd.CardinalsOrder
+import OrdinalsInductionRecursion.TarskiOrd.Cofinality
+import OrdinalsInductionRecursion.TarskiOrd.CardinalsFamily
 import OrdinalsInductionRecursion.DybjerOrd.Univ
 import OrdinalsInductionRecursion.DybjerOrd.PreOrd
 import OrdinalsInductionRecursion.DybjerOrd.Ordinals
