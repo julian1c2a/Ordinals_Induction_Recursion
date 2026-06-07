@@ -4,11 +4,12 @@ import OrdinalsInductionRecursion.UnivOrd.Induction
 
 universe u
 
-namespace UnivOrd
+namespace LargeCardinals
 namespace Inaccessible
 
-open Ordinal
-open Cardinals
+open UnivOrd
+open UnivOrd.Ordinal
+open UnivOrd.Cardinals
 
 /-- Un ordinal es regular si no puede ser alcanzado por un supremo de tamaño menor. -/
 def IsRegular (α : Ordinal.{u}) : Prop :=
@@ -46,4 +47,4 @@ noncomputable def omega_hierarchy (α : Ordinal.{u}) : Ordinal.{u} :=
     (fun β _ ih => nextUniverse (sup_over_lt β ih))
 
 end Inaccessible
-end UnivOrd
+end LargeCardinals

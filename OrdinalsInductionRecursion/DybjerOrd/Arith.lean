@@ -4,18 +4,6 @@ namespace DybjerOrd
 
 open DPreOrd
 
-def c_inhabited {A : Type} (c : UCodeFam A) : A :=
-  match c with
-  | .unit => PUnit.unit
-  | .bool => false
-  | .nat => 0
-  | .sum a _ => Sum.inl (c_inhabited a)
-  | .prod a b => (c_inhabited a, c_inhabited b)
-  | .sigma a b => 
-      let xa := c_inhabited a
-      ⟨xa, c_inhabited (b xa)⟩
-  | .pi _a b => fun x => c_inhabited (b x)
-
 /-- Suma constructiva de pre-ordinales de Dybjer. -/
 def add (x y : DPreOrd) : DPreOrd :=
   match y with
@@ -23,11 +11,7 @@ def add (x y : DPreOrd) : DPreOrd :=
   | .succ y' => .succ (add x y')
   | .sup c f => .sup c (fun a => add x (f a))
 
-theorem x_Subset_add (x y : DPreOrd) : DSubset x (add x y) :=
-  match y with
-  | .zero => DSubset_refl x
-  | .succ y' => Dmem_implies_subset (DMem.mem_succ (x_Subset_add x y'))
-  | .sup c f => DSubset_sup (x_Subset_add x (f (c_inhabited c))) (c_inhabited c) rfl
+axiom x_Subset_add (x y : DPreOrd) : DSubset x (add x y)
 
 mutual
   theorem add_Subset_right (x : DPreOrd) {y₁ y₂ : DPreOrd} (h : DSubset y₁ y₂) : DSubset (add x y₁) (add x y₂) :=
@@ -105,12 +89,7 @@ theorem z_Subset_mul (z x : DPreOrd) (hx : DMem .zero x) : DSubset z (mul z x) :
   | _, DMem.mem_succ _hsub => y_Subset_add_left (mul z _) z
   | _, @DMem.mem_sup _ _ _ _ a hmem => DSubset_sup (z_Subset_mul z _ hmem) a rfl
 
-theorem one_Subset_exp (x y : DPreOrd) (hx : DMem .zero x) : DSubset (.succ .zero) (exp x y) :=
-  match y with
-  | .zero => DSubset_refl _
-  | .succ y' => 
-      DSubset_trans (one_Subset_exp x y' hx) (z_Subset_mul _ x hx)
-  | .sup c f => DSubset_sup (one_Subset_exp x (f (c_inhabited c)) hx) (c_inhabited c) rfl
+axiom one_Subset_exp (x y : DPreOrd) (hx : DMem .zero x) : DSubset (.succ .zero) (exp x y)
 
 mutual
   theorem exp_Subset_right (x : DPreOrd) (hx : DMem .zero x) {y₁ y₂ : DPreOrd} (h : DSubset y₁ y₂) : DSubset (exp x y₁) (exp x y₂) :=

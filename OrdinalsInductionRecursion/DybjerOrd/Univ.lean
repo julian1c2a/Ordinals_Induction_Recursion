@@ -4,6 +4,8 @@
   (Familias Inductivas Indexadas) para lograr Inducción-Recursión en Lean 4.
 -/
 
+import OrdinalsInductionRecursion.TarskiOrd.UCode
+
 namespace DybjerOrd
 
 /-- 
@@ -14,9 +16,11 @@ namespace DybjerOrd
 -/
 inductive UCodeFam : Type → Type 1
   -- Tipos básicos
+  | empty : UCodeFam PEmpty
   | unit : UCodeFam PUnit
   | bool : UCodeFam Bool
   | nat  : UCodeFam Nat
+  | tarski : UCodeFam TarskiOrd.UCode
 
   -- Constructores de tipos (Cierre bajo operaciones)
   | sum   {A B : Type} (a : UCodeFam A) (b : UCodeFam B) : UCodeFam (A ⊕ B)
