@@ -48,6 +48,8 @@ import OrdinalsInductionRecursion.UnivSets.Lift
 import OrdinalsInductionRecursion.UnivOrd.Ordinals
 import OrdinalsInductionRecursion.UnivOrd.WellOrder
 import OrdinalsInductionRecursion.UnivOrd.OrdinalsLattice
+import OrdinalsInductionRecursion.UnivSets.Embeddings
+import OrdinalsInductionRecursion.UnivSets.EmbedDybjer
 import OrdinalsInductionRecursion.UnivOrd.Arith
 import OrdinalsInductionRecursion.UnivOrd.Isomorphism
 import OrdinalsInductionRecursion.UnivOrd.Cardinals
@@ -55,5 +57,20 @@ import OrdinalsInductionRecursion.UnivOrd.Induction
 import OrdinalsInductionRecursion.LargeCardinals.Inaccessible
 import OrdinalsInductionRecursion.LargeCardinals.Filters
 import OrdinalsInductionRecursion.LargeCardinals.CUB
+import OrdinalsInductionRecursion.LargeCardinals.Mahlo
+import OrdinalsInductionRecursion.LargeCardinals.Measurable
+import OrdinalsInductionRecursion.LargeCardinals.Supercompact
+import OrdinalsInductionRecursion.LargeCardinals.Vopenka
 import OrdinalsInductionRecursion.UnivOrd.Lift
 import OrdinalsInductionRecursion.CountableOrd.Induction
+import OrdinalsInductionRecursion.ModelTheory.Universe
+import OrdinalsInductionRecursion.ModelTheory.Structures
+import OrdinalsInductionRecursion.ModelTheory.Embeddings
+
+-- MK⁺ (TG+VP) Foundation
+import OrdinalsInductionRecursion.MKplusCAC.Prelim
+import OrdinalsInductionRecursion.MKplusCAC.MKplusCACAxioms
+import OrdinalsInductionRecursion.MKplusCAC.Relations
+import OrdinalsInductionRecursion.MKplusCAC.Functions
+import OrdinalsInductionRecursion.MKplusCAC.Tarski
+import OrdinalsInductionRecursion.MKplusCAC.Vopenka

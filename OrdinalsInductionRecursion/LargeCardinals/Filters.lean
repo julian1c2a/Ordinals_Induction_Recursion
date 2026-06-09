@@ -19,15 +19,24 @@ structure Filter (κ : Ordinal.{u}) where
   upward_closed : ∀ X Y, sets X → (∀ α < κ, X α → Y α) → sets Y
 
 /-- 
-  Un filtro es λ-completo si es cerrado bajo intersecciones de tamaño menor a λ.
-  En nuestro marco, representamos una familia de conjuntos indexada por `A`.
+  Un filtro es λ-completo si es cerrado bajo intersecciones de familias indexadas
+  por ordinales estrictamente menores que λ.
 -/
 def IsCompleteFilter (κ lam : Ordinal.{u}) (F : Filter κ) : Prop :=
-  ∀ (A : Type u) (f : A → (Ordinal.{u} → Prop)),
-    -- Si la cardinalidad de A es menor que λ (conceptualizado vía inyección a un ordinal < λ)
-    -- y cada conjunto de la familia está en el filtro...
-    -- (Por ahora, para Filtros CUB, nos basta con la completitud respecto a la intersección finita,
-    -- o la completitud diagonal de Mahlo que abordaremos más adelante).
-    True
+  ∀ (γ : Ordinal.{u}) (hγ : γ < lam) (f : Ordinal.{u} → (Ordinal.{u} → Prop)),
+    (∀ α < γ, F.sets (f α)) →
+    F.sets (fun β => ∀ α < γ, f α β)
+
+/-- Un ultrafiltro es un filtro maximal: para cada conjunto, él o su complemento pertenecen al filtro. -/
+def IsUltrafilter (κ : Ordinal.{u}) (F : Filter κ) : Prop :=
+  ∀ X, F.sets X ∨ F.sets (fun α => ¬ X α)
+
+/-- Un filtro es no principal si no está generado por un único elemento (no contiene singletons).
+    Como los ordinales son linealmente ordenados, ser no principal es equivalente a que
+    ningún conjunto acotado pertenezca al filtro (para un filtro uniforme sobre κ).
+    Para medibles, formalizamos que ningún subconjunto finito pertenece. Para nuestro
+    propósito, "no contiene singletons" es la base estructural. -/
+def IsNonPrincipal (κ : Ordinal.{u}) (F : Filter κ) : Prop :=
+  ∀ α < κ, ¬ F.sets (fun β => β = α)
 
 end LargeCardinals

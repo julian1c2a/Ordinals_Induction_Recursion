@@ -49,6 +49,90 @@ def singleton (a : DSet) : DSet := insert a empty
 
 def pair (a b : DSet) : DSet := insert a (singleton b)
 
+theorem mem_insertTree_iff {c a b : Tree} : Mem c (insertTree a b) ↔ Equiv c a ∨ Mem c b := by
+  cases b
+  case zero =>
+    constructor
+    · intro h
+      cases h
+      rename_i h1 h2
+      left
+      exact ⟨h1, h2⟩
+    · intro h
+      cases h
+      case inl heq =>
+        exact mem_succ_equiv heq
+      case inr hmem =>
+        cases hmem
+  case succ d =>
+    constructor
+    · intro h
+      cases h
+      rename_i i h1 h2
+      cases i
+      case inl _ =>
+        left
+        exact ⟨h1, h2⟩
+      case inr _ =>
+        right
+        exact mem_succ_equiv ⟨h1, h2⟩
+    · intro h
+      cases h
+      case inl heq =>
+        exact mem_sup_equiv (Sum.inl ()) heq
+      case inr hmem =>
+        cases hmem
+        rename_i hd1 hd2
+        exact mem_sup_equiv (Sum.inr ()) ⟨hd1, hd2⟩
+  case sup A fam f =>
+    constructor
+    · intro h
+      cases h
+      rename_i i h1 h2
+      cases i
+      case inl _ =>
+        left
+        exact ⟨h1, h2⟩
+      case inr j =>
+        right
+        exact mem_sup_equiv j ⟨h1, h2⟩
+    · intro h
+      cases h
+      case inl heq =>
+        exact mem_sup_equiv (Sum.inl ()) heq
+      case inr hmem =>
+        cases hmem
+        rename_i j hd1 hd2
+        exact mem_sup_equiv (Sum.inr j) ⟨hd1, hd2⟩
+
+theorem mem_insert_iff {c a b : DSet} : c ∈ insert a b ↔ c = a ∨ c ∈ b := by
+  induction c using Quotient.ind
+  induction a using Quotient.ind
+  induction b using Quotient.ind
+  rename_i t_c t_a t_b
+  change Tree.Mem t_c (insertTree t_a t_b) ↔ Quotient.mk Tree.Setoid t_c = Quotient.mk Tree.Setoid t_a ∨ Tree.Mem t_c t_b
+  rw [mem_insertTree_iff]
+  apply Iff.intro
+  · rintro (h1 | h2)
+    · left; exact Quotient.sound h1
+    · right; exact h2
+  · rintro (h1 | h2)
+    · left; exact Quotient.exact h1
+    · right; exact h2
+
+theorem mem_singleton_iff {c a : DSet} : c ∈ singleton a ↔ c = a := by
+  change c ∈ insert a empty ↔ c = a
+  rw [mem_insert_iff]
+  apply Iff.intro
+  · rintro (h1 | h2)
+    · exact h1
+    · exfalso; exact not_mem_empty c h2
+  · intro h; left; exact h
+
+theorem mem_pair_iff {c a b : DSet} : c ∈ pair a b ↔ c = a ∨ c = b := by
+  change c ∈ insert a (singleton b) ↔ c = a ∨ c = b
+  rw [mem_insert_iff, mem_singleton_iff]
+
 -- ══════════════════════════════════════════════════════════════════
 -- § 4. Axioma del Infinito (Conjunto ω)
 -- ══════════════════════════════════════════════════════════════════
@@ -100,6 +184,62 @@ def sUnion (x : DSet) : DSet :=
   Quotient.lift (fun t => Quotient.mk Tree.Setoid (unionTree t))
     (fun _ _ h => Quotient.sound (union_respects _ _ h)) x
 
+theorem mem_iff_exists_index {x y : Tree} : Mem x y ↔ ∃ i : indexType y, Equiv x (indexFun y i) := by
+  cases y
+  case zero =>
+    constructor
+    · intro h
+      cases h
+    · intro h
+      obtain ⟨i, _⟩ := h
+      cases i
+  case succ d =>
+    constructor
+    · intro h
+      cases h
+      rename_i h1 h2
+      exact ⟨(), h1, h2⟩
+    · intro h
+      obtain ⟨i, heq⟩ := h
+      exact mem_succ_equiv heq
+  case sup A c f =>
+    constructor
+    · intro h
+      cases h
+      rename_i a h1 h2
+      exact ⟨a, h1, h2⟩
+    · intro h
+      obtain ⟨a, heq⟩ := h
+      exact mem_sup_equiv a heq
+
+theorem mem_unionTree_iff {c t : Tree} : Mem c (unionTree t) ↔ ∃ v, Mem c v ∧ Mem v t := by
+  unfold unionTree
+  rw [mem_iff_exists_index]
+  constructor
+  · rintro ⟨p, heq⟩
+    have hv_t : Mem (indexFun t p.1) t := (mem_iff_exists_index).mpr ⟨p.1, Equiv_refl _⟩
+    have hc_v : Mem c (indexFun t p.1) := (mem_iff_exists_index).mpr ⟨p.2, heq⟩
+    exact ⟨indexFun t p.1, hc_v, hv_t⟩
+  · rintro ⟨v, hc_v, hv_t⟩
+    obtain ⟨i, heq_v⟩ := mem_iff_exists_index.mp hv_t
+    have hc_f_i : Mem c (indexFun t i) := Mem_Subset_trans hc_v heq_v.left
+    obtain ⟨j, heq_c⟩ := mem_iff_exists_index.mp hc_f_i
+    exact ⟨⟨i, j⟩, heq_c⟩
+
+theorem mem_sUnion_iff {c x : DSet} : c ∈ sUnion x ↔ ∃ v, c ∈ v ∧ v ∈ x := by
+  induction c using Quotient.ind
+  induction x using Quotient.ind
+  rename_i t_c t_x
+  change Tree.Mem t_c (unionTree t_x) ↔ ∃ v : DSet, Quotient.mk Tree.Setoid t_c ∈ v ∧ v ∈ Quotient.mk Tree.Setoid t_x
+  rw [mem_unionTree_iff]
+  constructor
+  · rintro ⟨v, hc_v, hv_tx⟩
+    exact ⟨Quotient.mk Tree.Setoid v, hc_v, hv_tx⟩
+  · rintro ⟨v_set, hc_vset, hvset_x⟩
+    induction v_set using Quotient.ind
+    rename_i v
+    exact ⟨v, hc_vset, hvset_x⟩
+
 -- ══════════════════════════════════════════════════════════════════
 -- § 7. Axioma del Conjunto Potencia (𝒫(A))
 -- ══════════════════════════════════════════════════════════════════
@@ -129,6 +269,103 @@ axiom powerset_respects (a b : Tree) (h : Equiv a b) : Equiv (powersetTree a) (p
 def powerset (x : DSet) : DSet :=
   Quotient.lift (fun t => Quotient.mk Tree.Setoid (powersetTree t))
     (fun _ _ h => Quotient.sound (powerset_respects _ _ h)) x
+
+noncomputable section
+
+local instance (p : Prop) : Decidable p := Classical.propDecidable p
+
+theorem mem_filterTree_iff {c t : Tree} {g : indexType t → Bool} : Mem c (filterTree t g) ↔ ∃ i : indexType t, g i = true ∧ Equiv c (indexFun t i) := by
+  unfold filterTree
+  rw [mem_iff_exists_index]
+  constructor
+  · rintro ⟨p, heq⟩
+    have hp2 : g p.1 = true := by
+      cases hg : g p.1
+      case false =>
+        have hp2' : FilterType false := hg ▸ p.2
+        cases hp2'
+      case true => rfl
+    exact ⟨p.1, hp2, heq⟩
+  · rintro ⟨i, hgi, heq⟩
+    have hp2 : FilterType (g i) := by
+      rw [hgi]
+      exact ⟨⟩
+    exact ⟨⟨i, hp2⟩, heq⟩
+
+theorem Subset_iff_forall_Mem {x y : Tree} : Tree.Subset x y ↔ ∀ u, Mem u x → Mem u y := by
+  constructor
+  · intro h u hu
+    exact Mem_Subset_trans hu h
+  · intro h
+    cases x
+    case zero => exact Tree.Subset.zero_subset y
+    case succ a =>
+      have ha : Mem a (Tree.succ a) := mem_succ_equiv (Equiv_refl a)
+      exact Tree.Subset.succ_subset (h a ha)
+    case sup A c f =>
+      apply Tree.Subset.sup_subset
+      intro a
+      have ha : Mem (f a) (Tree.sup c f) := mem_sup_equiv a (Equiv_refl (f a))
+      exact h (f a) ha
+
+theorem mem_powersetTree_iff {c t : Tree} : Mem c (powersetTree t) ↔ Tree.Subset c t := by
+  unfold powersetTree
+  rw [mem_iff_exists_index]
+  constructor
+  · rintro ⟨g, heq⟩
+    apply Subset_iff_forall_Mem.mpr
+    intro x hx
+    have hx_filter : Mem x (filterTree t g) := Mem_Subset_trans hx heq.left
+    obtain ⟨i, _, hx_eq⟩ := mem_filterTree_iff.mp hx_filter
+    have ht : Mem (indexFun t i) t := (mem_iff_exists_index).mpr ⟨i, Equiv_refl _⟩
+    exact Equiv_Mem_trans hx_eq ht
+  · intro hsub
+    let g : indexType t → Bool := fun i =>
+      if Mem (indexFun t i) c then true else false
+    refine ⟨g, ?_⟩
+    constructor
+    · apply Subset_iff_forall_Mem.mpr
+      intro x hx
+      have hxt : Mem x t := Subset_iff_forall_Mem.mp hsub x hx
+      obtain ⟨i, hx_eq⟩ := mem_iff_exists_index.mp hxt
+      have h_mem_c : Mem (indexFun t i) c := Equiv_Mem_trans (Equiv_symm hx_eq) hx
+      have hgi : g i = true := by
+        change (if Mem (indexFun t i) c then true else false) = true
+        rw [if_pos h_mem_c]
+      apply mem_filterTree_iff.mpr
+      exact ⟨i, hgi, hx_eq⟩
+    · apply Subset_iff_forall_Mem.mpr
+      intro x hx
+      obtain ⟨i, hgi, hx_eq⟩ := mem_filterTree_iff.mp hx
+      have h_mem_c : Mem (indexFun t i) c := by
+        change (if Mem (indexFun t i) c then true else false) = true at hgi
+        split at hgi
+        · assumption
+        · contradiction
+      exact Equiv_Mem_trans hx_eq h_mem_c
+
+theorem mem_powerset_iff {c t : DSet} : c ∈ powerset t ↔ c ⊆ t := by
+  induction c using Quotient.ind
+  induction t using Quotient.ind
+  rename_i t_c t_t
+  change Tree.Mem t_c (powersetTree t_t) ↔ Tree.Subset t_c t_t
+  exact mem_powersetTree_iff
+
+theorem subset_iff_forall_mem {c t : DSet} : c ⊆ t ↔ ∀ u, u ∈ c → u ∈ t := by
+  induction c using Quotient.ind
+  induction t using Quotient.ind
+  rename_i t_c t_t
+  change Tree.Subset t_c t_t ↔ ∀ u : DSet, u ∈ Quotient.mk Tree.Setoid t_c → u ∈ Quotient.mk Tree.Setoid t_t
+  rw [Subset_iff_forall_Mem]
+  constructor
+  · intro h u hu
+    induction u using Quotient.ind
+    rename_i t_u
+    exact h t_u hu
+  · intro h u hu
+    exact h (Quotient.mk Tree.Setoid u) hu
+
+end
 
 -- ══════════════════════════════════════════════════════════════════
 -- § 8. Axioma de Reemplazo

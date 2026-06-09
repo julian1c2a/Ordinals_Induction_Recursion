@@ -26,12 +26,24 @@ El objetivo maestro es estabilizar los esqueletos fundamentales de los árboles 
 - [x] Aritmética transinfinita en `DybjerOrd` ($\aleph$, $\beth$, Universos de Grothendieck explícitos).
 - [ ] **OBJETIVO ACTIVO:** Trasplantar y completar ZFC en `DybjerSet` (aprovechando `Sigma` y `Pi` para la Unión y el Conjunto Potencia).
 
-### 🔴 Fase 4: La Jerarquía de Grandes Cardinales (Por Iniciar)
+### 🟢 Fase 4: La Jerarquía de Grandes Cardinales (Completado)
 *(Consultar `LARGE_CARDINALS_ROADMAP.md` para los detalles exhaustivos).*
-- [ ] **Teoría Descriptiva:** Filtros, Ideales y Conjuntos Estacionarios.
-- [ ] **Cardinales de Mahlo:** Postulación de inalcanzabilidad estacionaria.
-- [ ] **Teoría de Modelos y Medibilidad:** Ultrafiltros e Inmersiones Elementales ($j : V \to M$).
-- [ ] **El Principio de Vopěnka:** Culminación teórica de los axiomas de tamaño estructural.
+- [x] **Teoría Descriptiva:** Filtros, Ideales y Conjuntos Estacionarios.
+- [x] **Cardinales de Mahlo:** Postulación de inalcanzabilidad estacionaria.
+- [x] **Teoría de Modelos y Medibilidad:** Ultrafiltros e Inmersiones Elementales ($j : V \to M$).
+- [x] **El Principio de Vopěnka:** Culminación teórica de los axiomas de tamaño estructural en ZFC.
+
+### 🟢 Fase 5: Fundamentación Constructiva de MK⁺ sobre `UnivSets` (Completado)
+- [x] Abandonar los axiomas huérfanos: Redefinir `Class := UnivSets.USet → Prop`.
+- [x] Reformular los axiomas de Morse-Kelley como teoremas constructivos, demostrándolos a partir de las propiedades de los árboles de `UnivSets`.
+- [x] Adaptar Vopěnka nativamente sobre estas nuevas Clases constructivas.
+- [x] Recuperar el Axioma de Elección Global (CAC) utilizando `Classical.choice` sobre `UnivSets`.
+
+### 🟡 Fase 6: La Gran Unificación (El Universo de Dybjer como Conjunto MK) (Activa)
+- [x] Formalizar la inmersión estricta `DSet ↪ UnivSets.USet`. (Hecho en `EmbedDybjer.lean`).
+- [ ] Definir la Clase `DybjerUniverse` como la imagen de esta inmersión dentro de MK⁺.
+- [ ] **Teorema de Tarski Constructivo**: Demostrar que `DybjerUniverse` es un **Conjunto** en MK⁺ (`IsSet DybjerUniverse`) y que satisface ser un Universo de Grothendieck interno.
+- [ ] Relacionar formalmente los grandes cardinales (Inaccesibles, Mahlo, Supercompactos) descubiertos en `DSet` como entidades internas del Universo de Dybjer dentro de Morse-Kelley.
 
 ---
 

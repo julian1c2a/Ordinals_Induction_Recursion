@@ -9,6 +9,8 @@ require peanolib from git
 require aczelsettheory from git
   "https://github.com/julian1c2a/AczelSetTheory.git" @ "master"
 
+require «FOL» from "../FOL"
+
 lean_lib «OrdinalsInductionRecursion» where
   roots := #[`OrdinalsInductionRecursion]
 

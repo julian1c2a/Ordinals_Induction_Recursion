@@ -65,13 +65,6 @@ def embedUnivOrdTree : PreOrd.{u} → Tree.{u}
   | .succ x => insertTree (embedUnivOrdTree x) (embedUnivOrdTree x)
   | .sup f => unionTree (sup (α := _) fun a => embedUnivOrdTree (f a))
 
-theorem mem_insertTree_of_mem {a x b : Tree.{u}} (h : Tree.Mem x b) : Tree.Mem x (insertTree a b) := by
-  cases b
-  rename_i β f
-  cases h
-  rename_i i h1 h2
-  exact Tree.Mem.mem_sup (some i) h1 h2
-
 theorem mem_insertTree_of_equiv {a x b : Tree.{u}} (h : Tree.Equiv x a) : Tree.Mem x (insertTree a b) := by
   cases b
   exact Tree.Mem.mem_sup none h.left h.right

@@ -117,9 +117,55 @@ theorem insertTree_respects (a1 a2 b1 b2 : Tree.{u}) (ha : Tree.Equiv a1 a2) (hb
       rename_i a' h1 h2
       exact Tree.Mem.mem_sup (some a') h1 h2
 
+theorem mem_insertTree_of_mem {x a b : Tree.{u}} (h : Tree.Mem x b) : Tree.Mem x (insertTree a b) := by
+  cases b
+  rename_i β f
+  cases h
+  rename_i a' hx_fa hfa_x
+  exact Tree.Mem.mem_sup (some a') hx_fa hfa_x
+
+theorem mem_of_mem_insertTree {x a b : Tree.{u}} (h : Tree.Mem x (insertTree a b)) : Tree.Equiv x a ∨ Tree.Mem x b := by
+  cases b
+  rename_i β f
+  cases h
+  rename_i o hx h_x
+  cases o with
+  | none => exact Or.inl ⟨hx, h_x⟩
+  | some b' => exact Or.inr (Tree.Mem.mem_sup b' hx h_x)
+
 def insert (a b : USet.{u}) : USet.{u} :=
   Quotient.lift₂ (fun x y => Quotient.mk Tree.Setoid (insertTree x y))
     (fun _ _ _ _ ha hb => Quotient.sound (insertTree_respects _ _ _ _ ha hb)) a b
+
+theorem mem_insert_iff (x a b : USet.{u}) : x ∈ insert a b ↔ x = a ∨ x ∈ b := by
+  induction a using Quotient.ind
+  induction b using Quotient.ind
+  induction x using Quotient.ind
+  rename_i x_tree b_tree a_tree
+  constructor
+  · intro h
+    cases mem_of_mem_insertTree h with
+    | inl hl => exact Or.inl (Quotient.sound hl)
+    | inr hr => exact Or.inr hr
+  · rintro (h | h)
+    · rw [← h]
+      exact mem_insertTree_self a_tree b_tree
+    · exact mem_insertTree_of_mem h
+
+def pair (a b : USet.{u}) : USet.{u} := insert a (insert b empty)
+
+theorem mem_pair_iff (x a b : USet.{u}) : x ∈ pair a b ↔ x = a ∨ x = b := by
+  unfold pair
+  rw [mem_insert_iff, mem_insert_iff]
+  have h_empty : ¬ (x ∈ empty) := not_mem_empty x
+  constructor
+  · rintro (h | h | h)
+    · exact Or.inl h
+    · exact Or.inr h
+    · contradiction
+  · rintro (h | h)
+    · exact Or.inl h
+    · exact Or.inr (Or.inl h)
 
 -- ==========================================
 -- 3. Unión
@@ -195,6 +241,36 @@ theorem mem_union_of_mem_mem {y x A : USet.{u}} (hyx : y ∈ x) (hxa : x ∈ A) 
   rename_i y_tree
   exact mem_unionTree_of_mem_mem hyx hxa
 
+theorem Tree.mem_sup_equiv_new {x : Tree.{u}} {α : Type u} {f : α → Tree.{u}} (a : α) (h : Tree.Equiv x (f a)) : Tree.Mem x (Tree.sup f) :=
+  Tree.Mem.mem_sup a h.left h.right
+
+theorem Tree.subset_iff {a b : Tree.{u}} : Tree.Subset a b ↔ ∀ x, Tree.Mem x a → Tree.Mem x b := by
+  constructor
+  · intro h x hx
+    exact Tree.Mem_Subset_trans hx h
+  · intro h
+    cases a
+    rename_i f
+    apply Tree.Subset.sup_subset
+    intro i
+    have h_mem : Tree.Mem (f i) (Tree.sup f) := Tree.mem_sup_equiv_new i (Tree.Equiv_refl _)
+    exact h (f i) h_mem
+
+theorem uset_subset_iff {a b : USet.{u}} : a ⊆ b ↔ ∀ x, x ∈ a → x ∈ b := by
+  induction a using Quotient.ind
+  induction b using Quotient.ind
+  rename_i b_tree a_tree
+  constructor
+  · intro h x hx
+    induction x using Quotient.ind
+    rename_i x_tree
+    exact Tree.Mem_Subset_trans hx h
+  · intro h
+    apply Tree.subset_iff.mpr
+    intro x_tree hx
+    have h' := h (Quotient.mk Tree.Setoid x_tree) hx
+    exact h'
+
 theorem exists_mem_of_mem_union {y A : USet.{u}} (hya : y ∈ union A) : ∃ x, x ∈ A ∧ y ∈ x := by
   induction A using Quotient.ind
   rename_i a_tree
@@ -202,6 +278,12 @@ theorem exists_mem_of_mem_union {y A : USet.{u}} (hya : y ∈ union A) : ∃ x, 
   rename_i y_tree
   have ⟨x_tree, hxA, hyx⟩ := exists_mem_of_mem_unionTree hya
   exact ⟨Quotient.mk Setoid x_tree, hxA, hyx⟩
+
+theorem mem_union_iff (y A : USet.{u}) : y ∈ union A ↔ ∃ x, y ∈ x ∧ x ∈ A :=
+  ⟨fun h =>
+    let ⟨x, hxA, hyx⟩ := exists_mem_of_mem_union h
+    ⟨x, hyx, hxA⟩,
+   fun ⟨_x, hyx, hxA⟩ => mem_union_of_mem_mem hyx hxA⟩
 
 -- ==========================================
 -- 4. Conjunto Potencia (Power Set)
@@ -277,6 +359,9 @@ def powerset (a : USet.{u}) : USet.{u} :=
   Quotient.lift (fun x => Quotient.mk Tree.Setoid (powersetTree x))
     (fun _ _ h => Quotient.sound (powersetTree_respects _ _ h)) a
 
+theorem mem_powerset_iff (x A : USet.{u}) : x ∈ powerset A ↔ x ⊆ A := by
+  sorry
+
 -- ==========================================
 -- 5. Axioma de Reemplazo
 -- ==========================================
@@ -313,6 +398,45 @@ theorem replTree_respects (f : Tree.{u} → Tree.{u}) (hf : ∀ x y, Tree.Equiv 
 def repl (f : Tree.{u} → Tree.{u}) (hf : ∀ x y, Tree.Equiv x y → Tree.Equiv (f x) (f y)) (a : USet.{u}) : USet.{u} :=
   Quotient.lift (fun x => Quotient.mk Tree.Setoid (replTree f x))
     (fun _ _ h => Quotient.sound (replTree_respects f hf _ _ h)) a
+
+def liftFun (f : Tree.{u} → Tree.{u}) (hf : ∀ x y, Tree.Equiv x y → Tree.Equiv (f x) (f y)) (x : USet.{u}) : USet.{u} :=
+  Quotient.lift (fun t => Quotient.mk Tree.Setoid (f t))
+    (fun a b hab => Quotient.sound (hf a b hab)) x
+
+noncomputable def USet.out (x : USet.{u}) : Tree.{u} :=
+  Classical.choose (Quotient.exists_rep x)
+
+theorem USet.out_eq (x : USet.{u}) : Quotient.mk Tree.Setoid (USet.out x) = x :=
+  Classical.choose_spec (Quotient.exists_rep x)
+
+theorem mem_repl_iff (f : Tree.{u} → Tree.{u}) (hf : ∀ x y, Tree.Equiv x y → Tree.Equiv (f x) (f y)) (a y : USet.{u}) :
+  y ∈ repl f hf a ↔ ∃ x ∈ a, y = liftFun f hf x := by
+  induction a using Quotient.ind
+  rename_i a_tree
+  induction y using Quotient.ind
+  rename_i y_tree
+  constructor
+  · intro hy
+    have hy_mem : Tree.Mem y_tree (replTree f a_tree) := hy
+    cases a_tree
+    rename_i α g
+    cases hy_mem
+    rename_i i h_left h_right
+    have h_x_mem : Tree.Mem (g i) (sup g) := Tree.Mem.mem_sup i (Tree.Subset_refl (g i)) (Tree.Subset_refl (g i))
+    refine ⟨Quotient.mk Tree.Setoid (g i), h_x_mem, ?_⟩
+    exact Quotient.sound ⟨h_left, h_right⟩
+  · rintro ⟨x, hx_mem, hx_eq⟩
+    induction x using Quotient.ind
+    rename_i x_tree
+    have hx_mem_tree : Tree.Mem x_tree a_tree := hx_mem
+    cases a_tree
+    rename_i α g
+    cases hx_mem_tree
+    rename_i i h_x_g_left h_x_g_right
+    have h_y_tree_eq : Tree.Equiv y_tree (f x_tree) := Quotient.exact hx_eq
+    have h_f_x_f_g : Tree.Equiv (f x_tree) (f (g i)) := hf x_tree (g i) ⟨h_x_g_left, h_x_g_right⟩
+    have h_y_tree_equiv : Tree.Equiv y_tree (f (g i)) := Tree.Equiv_trans h_y_tree_eq h_f_x_f_g
+    exact Tree.Mem.mem_sup i h_y_tree_equiv.left h_y_tree_equiv.right
 
 -- ==========================================
 -- 6. Axioma de Separación (Decidible)
@@ -351,6 +475,120 @@ def sep (P : Tree.{u} → Prop) [∀ x, Decidable (P x)] (hP : ∀ x y, Tree.Equ
   Quotient.lift (fun x => Quotient.mk Tree.Setoid (sepTree P x))
     (fun _ _ h => Quotient.sound (sepTree_respects P hP _ _ h)) a
 
+def sepUSetP (P : Tree.{u} → Prop) (hP : ∀ x y, Tree.Equiv x y → (P x ↔ P y)) (x : USet.{u}) : Prop :=
+  Quotient.lift P (fun a b hab => propext (hP a b hab)) x
+
+theorem mem_sep_iff (P : Tree.{u} → Prop) [∀ x, Decidable (P x)] (hP : ∀ x y, Tree.Equiv x y → (P x ↔ P y)) (a y : USet.{u}) :
+  y ∈ sep P hP a ↔ y ∈ a ∧ sepUSetP P hP y := by
+  induction a using Quotient.ind
+  rename_i a_tree
+  induction y using Quotient.ind
+  rename_i y_tree
+  constructor
+  · intro hy
+    have hy_mem : Tree.Mem y_tree (sepTree P a_tree) := hy
+    cases a_tree
+    rename_i α g
+    cases hy_mem
+    rename_i j h_left h_right
+    -- j : {i : α // P (g i)}
+    have h_x_mem : Tree.Mem (g j.val) (sup g) := Tree.Mem.mem_sup j.val (Tree.Subset_refl _) (Tree.Subset_refl _)
+    have h_P_gj : P (g j.val) := j.property
+    have hy_in_a : Tree.Mem y_tree (sup g) := Tree.Equiv_Mem_trans ⟨h_left, h_right⟩ h_x_mem
+    have h_P_y : P y_tree := (hP _ _ ⟨h_left, h_right⟩).mpr h_P_gj
+    exact ⟨hy_in_a, h_P_y⟩
+  · rintro ⟨hy_in_a, h_P_y⟩
+    have hy_mem : Tree.Mem y_tree a_tree := hy_in_a
+    have hP_ytree : P y_tree := h_P_y
+    cases a_tree
+    rename_i α g
+    cases hy_mem
+    rename_i i h_y_g_left h_y_g_right
+    have h_P_gi : P (g i) := (hP y_tree (g i) ⟨h_y_g_left, h_y_g_right⟩).mp hP_ytree
+    let j : {k : α // P (g k)} := ⟨i, h_P_gi⟩
+    exact Tree.Mem.mem_sup j h_y_g_left h_y_g_right
+
 end
+
+theorem Tree.mem_wf : WellFounded Tree.Mem := by
+  constructor
+  intro a
+  induction a with
+  | sup f ih =>
+    constructor
+    intro y hy
+    cases hy
+    rename_i a' hsub1 hsub2
+    constructor
+    intro z hz
+    have hz_f : Tree.Mem z (f a') := Tree.Mem_Subset_trans hz hsub1
+    exact (ih a').inv hz_f
+
+theorem uset_mem_wf : WellFounded (fun (x y : USet.{u}) => x ∈ y) := by
+  constructor
+  intro x
+  induction x using Quotient.ind
+  rename_i x_tree
+  have hwf := Tree.mem_wf.apply x_tree
+  induction hwf with
+  | intro a _ ih =>
+    constructor
+    intro y hy
+    induction y using Quotient.ind
+    rename_i y_tree
+    have h_mem_tree : Tree.Mem y_tree a := hy
+    exact ih y_tree h_mem_tree
+
+theorem wf_has_min {α : Type u} {r : α → α → Prop} (hwf : WellFounded r) (p : α → Prop) : (∃ x, p x) → ∃ m, p m ∧ ∀ x, r x m → ¬p x := by
+  intro h
+  apply Classical.byContradiction
+  intro h_contra
+  obtain ⟨x, hx⟩ := h
+  revert hx
+  have hwf_x := hwf.apply x
+  induction hwf_x with
+  | intro y _ ih =>
+    intro hy
+    have h_not_min : ¬ (p y ∧ ∀ z, r z y → ¬ p z) := fun h_min => h_contra ⟨y, h_min⟩
+    have h_ex : ∃ z, r z y ∧ p z := by
+      apply Classical.byContradiction
+      intro h_none
+      apply h_not_min
+      constructor
+      · exact hy
+      · intro z hz hz_p
+        exact h_none ⟨z, hz, hz_p⟩
+    obtain ⟨z, hz, hz_p⟩ := h_ex
+    exact ih z hz hz_p
+-- ==========================================
+-- 8. Axioma del Infinito (omega)
+-- ==========================================
+
+def natTree : Nat → Tree.{u}
+  | 0 => emptyTree
+  | n + 1 => insertTree (natTree n) (natTree n)
+
+def omegaTree : Tree.{u} := Tree.sup (α := ULift.{u} Nat) fun n => natTree n.down
+
+def omega : USet.{u} := Quotient.mk Tree.Setoid omegaTree
+
+theorem empty_mem_omega : empty.{u} ∈ omega.{u} := by
+  show Tree.Mem emptyTree omegaTree
+  apply Tree.Mem.mem_sup (ULift.up 0)
+  · apply Tree.Subset_refl
+  · apply Tree.Subset_refl
+
+theorem insert_mem_omega {y : USet.{u}} (hy : y ∈ omega.{u}) : insert y y ∈ omega.{u} := by
+  induction y using Quotient.ind
+  rename_i yTree
+  have hy' : Tree.Mem yTree omegaTree := hy
+  cases hy' with
+  | mem_sup n h_equiv_left h_equiv_right =>
+    show Tree.Mem (insertTree yTree yTree) omegaTree
+    apply Tree.Mem.mem_sup (ULift.up (n.down + 1))
+    · have h_equiv := insertTree_respects yTree (natTree n.down) yTree (natTree n.down) ⟨h_equiv_left, h_equiv_right⟩ ⟨h_equiv_left, h_equiv_right⟩
+      exact h_equiv.left
+    · have h_equiv := insertTree_respects yTree (natTree n.down) yTree (natTree n.down) ⟨h_equiv_left, h_equiv_right⟩ ⟨h_equiv_left, h_equiv_right⟩
+      exact h_equiv.right
 
 end UnivSets

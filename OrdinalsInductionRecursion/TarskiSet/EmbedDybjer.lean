@@ -53,14 +53,14 @@ theorem embedTarskiDybjer_injective : Function.Injective (embedTarskiDybjer) := 
   have h2 := embedTarskiDybjer_subset_iff.mp h_eq.2
   exact TSet.ext h1 h2
 
-/-- 
-  Tarski es un submodelo estricto: Existe un conjunto en DybjerSet que contiene 
+/--
+  Tarski es un submodelo estricto: Existe un conjunto en DybjerSet que contiene
   todo el Universo de Tarski como elementos, por lo tanto no pertenece a TarskiSet.
 -/
 def TarskiUniverse : DSet :=
-  Quotient.mk DybjerSet.Tree.Setoid (DybjerSet.Tree.sup .tarski (fun (c : TarskiOrd.UCode) => 
-    embedTarskiDybjerTree (TarskiSet.Tree.sup c (fun a => TarskiSet.Tree.zero))))
-    
+  Quotient.mk DybjerSet.Tree.Setoid (DybjerSet.Tree.sup .tarski (fun (c : TarskiOrd.UCode) =>
+    embedTarskiDybjerTree (TarskiSet.Tree.sup c (fun _a => TarskiSet.Tree.zero))))
+
 -- Note: Proving the strict bounding formally requires Cantor's theorem or similar,
 -- but the existence of `TarskiUniverse` above demonstrates that Dybjer can collect
 -- all Tarski codes into a single valid set, something impossible in Tarski's own universe.
