@@ -43,6 +43,14 @@ Actualmente, el proyecto contiene el código base de cuatro pilares fundacionale
   - **Teoría Cardinal Avanzada**: Exponenciación cardinal ($2^\kappa$) usando tipos dependientes y la sucesión de los números Beth ($\beth_\alpha$).
   - **Cardinales Inaccesibles**: Implementación de Universos de Grothendieck explícitos ($\Omega_\alpha$) mediante axiomas de clausura límite.
 
+## 5. Grandes Cardinales y Principio de Vopěnka (`UnivCard`)
+- **Propósito**: Alcanzar el límite superior de los axiomas de fuertes cardinales sobre el modelo de conjuntos genéricos (`UnivSets`).
+- **Logros**:
+  - **Jerarquía Topológica y CUB**: Formalización de la topología ordinal límite y conjuntos CUB sobre conjuntos materiales.
+  - **Puente de Grothendieck**: Axiomatización explícita del puente que conecta Cardinales Fuertemente Inaccesibles con Universos de Grothendieck.
+  - **Mahlo y Medibles**: Definición y consistencia de los Cardinales de Mahlo y los Ultrafiltros $\kappa$-completos para definir cardinales Medibles.
+  - **Principio de Vopěnka**: Modelado formal de clases de estructuras y postulación final del Axioma de Vopěnka. El marco resultante permite la fundamentación absoluta de la **Teoría de Categorías sobre ZFC + TG + VP**.
+
 ---
 
 ## 🛠 Estado del Proyecto

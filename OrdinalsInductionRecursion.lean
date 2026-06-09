@@ -74,3 +74,13 @@ import OrdinalsInductionRecursion.MKplusCAC.Relations
 import OrdinalsInductionRecursion.MKplusCAC.Functions
 import OrdinalsInductionRecursion.MKplusCAC.Tarski
 import OrdinalsInductionRecursion.MKplusCAC.Vopenka
+import OrdinalsInductionRecursion.UnivCard.Equipollence
+import OrdinalsInductionRecursion.UnivCard.Cardinal
+import OrdinalsInductionRecursion.UnivCard.Topology
+import OrdinalsInductionRecursion.UnivCard.CUB
+import OrdinalsInductionRecursion.UnivCard.Inaccessible
+import OrdinalsInductionRecursion.UnivCard.GrothendieckBridge
+import OrdinalsInductionRecursion.UnivCard.Mahlo
+import OrdinalsInductionRecursion.UnivCard.Measurable
+import OrdinalsInductionRecursion.UnivCard.Structure
+import OrdinalsInductionRecursion.UnivCard.Vopenka

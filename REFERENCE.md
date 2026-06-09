@@ -33,3 +33,8 @@ También cubre hitos matemáticos fundamentales como la *Inducción Transfinita*
 > Enlace directo: [**REFERENCE_universe_of_sets.md**](file:///e:/dropbox/github/lean4/Ordinals_Induction_Recursion/REFERENCE_universe_of_sets.md)
 
 A diferencia de los ordinales que asumen transitividad, los **Conjuntos** modelan el Universo Extensional ($V$) clásico. Aquí se explica en detalle la **Bisimulación de Aczel** (la verdadera clave computacional de la equivalencia extensional). Aborda los cuatro modelos equivalentes en el lado de la teoría de conjuntos: `CountableSets`, `UnivSets`, `TarskiSet` y `DybjerSet`, y detalla cómo se instancian los **Axiomas de ZF** (Vacío, Adjunción, Potencia, Reemplazo, Separación) en cada universo.
+
+### 4. Grandes Cardinales y Principio de Vopěnka
+> Enlace directo: [**REFERENCE_large_cardinals.md**](file:///e:/dropbox/github/lean4/Ordinals_Induction_Recursion/REFERENCE_large_cardinals.md)
+
+Este volumen documenta la jerarquía de Grandes Cardinales construida sobre los conjuntos materiales (`UnivCard`). Detalla la formalización del Puente de Grothendieck que conecta inaccesibles con universos de Dybjer, la caracterización de Cardinales de Mahlo y Medibles mediante topología y filtros sobre conjuntos materiales, y la cristalización final de la teoría de conjuntos con el Principio de Vopěnka aplicado a clases de estructuras relacionales.
