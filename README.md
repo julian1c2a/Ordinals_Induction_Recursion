@@ -1,5 +1,9 @@
 # Ordinals, Induction & Recursion: Skeletons for Aczel Set Theory
 
+> 🗄️ **Archivado el 2026‑10‑28.** Ya no se construye contra el FOL de hoy: `lakefile.lean` fija FOL al commit
+> `a16a111` (2026-06-09), el último de su `master` anterior al último commit de este proyecto. Registro y política:
+> [CONSUMIDORES.md de FOL](https://github.com/julian1c2a/FOL/blob/master/CONSUMIDORES.md).
+
 Este proyecto sirve como un entorno "sandbox" o campo de pruebas para la exploración y estabilización de esqueletos estructurales fundacionales. El objetivo principal es pulir y purificar estas estructuras matemáticas (ordinales, inducción, recursión transfinita, universos) para que puedan ser directamente integradas en proyectos más grandes, como el proyecto **AczelSetTheory**.
 
 Actualmente, el proyecto contiene el código base de cuatro pilares fundacionales, todos compilando en **Lean 4** sin ningún `sorry` (cero advertencias), cada uno dividido en dos vertientes (**Ord** para ordinales transitivos nativos y **Set** para conjuntos extensionales de Aczel):
